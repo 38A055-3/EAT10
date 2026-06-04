@@ -1,0 +1,45 @@
+[2026-05-26 17:28:53] INFO  WEBrick 1.4.4
+[2026-05-26 17:28:53] INFO  ruby 2.6.10 (2022-04-12) [universal.arm64e-darwin23]
+[2026-05-26 17:28:53] INFO  WEBrick::HTTPServer#start: pid=98279 port=8080
+[2026-05-26 17:30:02] ERROR `/favicon.ico' not found.
+::1 - - [26/May/2026:17:30:02 JST] "GET /favicon.ico HTTP/1.1" 404 324
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /favicon.ico
+::1 - - [26/May/2026:17:30:04 JST] "GET / HTTP/1.1" 200 8794
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /
+::1 - - [26/May/2026:17:30:05 JST] "GET /style.css HTTP/1.1" 200 25427
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /style.css
+::1 - - [26/May/2026:17:30:05 JST] "GET /app.js HTTP/1.1" 200 17502
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /app.js
+::1 - - [26/May/2026:17:31:00 JST] "GET /style.css HTTP/1.1" 304 0
+::1 - - [26/May/2026:17:31:00 JST] "GET /app.js HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /style.css
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /app.js
+::1 - - [26/May/2026:17:33:55 JST] "GET / HTTP/1.1" 304 0
+- -> /
+::1 - - [26/May/2026:17:33:55 JST] "GET /style.css HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /style.css
+::1 - - [26/May/2026:17:33:56 JST] "GET /app.js HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /app.js
+::1 - - [26/May/2026:17:37:24 JST] "GET / HTTP/1.1" 304 0
+- -> /
+::1 - - [26/May/2026:17:37:25 JST] "GET /style.css HTTP/1.1" 200 25671
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /style.css
+::1 - - [26/May/2026:17:37:25 JST] "GET /app.js HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /app.js
+::1 - - [26/May/2026:17:46:27 JST] "GET / HTTP/1.1" 304 0
+- -> /
+::1 - - [26/May/2026:17:46:27 JST] "GET /app.js HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /app.js
+::1 - - [26/May/2026:17:46:28 JST] "GET /style.css HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /style.css
+::1 - - [26/May/2026:17:48:14 JST] "GET /style.css HTTP/1.1" 304 0
+https://104bff15df332d4a-106-176-25-55.serveousercontent.com/ -> /style.css
+[2026-05-26 18:09:06] ERROR `/favicon.ico' not found.
+::1 - - [26/May/2026:18:09:06 JST] "GET /favicon.ico HTTP/1.1" 404 324
+https://d74702f5c5dc387f-106-176-25-55.serveousercontent.com/ -> /favicon.ico
+::1 - - [26/May/2026:18:09:08 JST] "GET / HTTP/1.1" 200 8794
+https://d74702f5c5dc387f-106-176-25-55.serveousercontent.com/ -> /
+::1 - - [26/May/2026:18:09:09 JST] "GET /app.js HTTP/1.1" 200 17502
+https://d74702f5c5dc387f-106-176-25-55.serveousercontent.com/ -> /app.js
+::1 - - [26/May/2026:18:09:09 JST] "GET /style.css HTTP/1.1" 200 25671
+https://d74702f5c5dc387f-106-176-25-55.serveousercontent.com/ -> /style.css

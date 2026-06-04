@@ -750,7 +750,8 @@ window.updateAllUIText = function() {
                 el.value = window.t(key);
             }
         } else {
-            el.innerHTML = window.t(key);
+            const prefix = el.getAttribute('data-i18n-prefix') || '';
+            el.innerHTML = prefix + window.t(key);
         }
     });
 };
