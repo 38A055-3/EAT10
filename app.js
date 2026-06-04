@@ -1898,16 +1898,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 tbody.innerHTML = '';
                 
-                if (data.length === 0) {
-                    loadingEl.style.display = 'none';
-                    tableEl.style.display = 'none';
-                    return;
+                // Pad data array to length 10
+                while (data.length < 10) {
+                    data.push({ isEmpty: true });
                 }
 
                 data.forEach((entry, index) => {
                     const tr = document.createElement('tr');
                     tr.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-                    if (entry.name === playerName) {
+                    if (!entry.isEmpty && entry.name === playerName) {
                         tr.style.background = 'rgba(168, 85, 247, 0.2)'; // Highlight player
                     }
                     
@@ -1916,15 +1915,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (index === 1) rankText = window.t('rank_2');
                     if (index === 2) rankText = window.t('rank_3');
                     
-                    tr.innerHTML = `
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
-                        <td style="padding: 12px; font-weight: bold; color: white;">
-                            <span style="display:inline-flex; align-items:center; margin-right:8px; vertical-align: middle;">
-                                ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(255, 255, 255, 0.8)'}; border-radius: 50%; display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.2rem;">${entry.icon || 'ha.png'}</span>`}
-                            </span> ${entry.name}
-                        </td>
-                        <td style="padding: 12px; text-align: right; font-size: 1.2rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: ${currentLeaderboardMode === 'streak' ? '#4ade80' : '#3b82f6'};">${entry[orderBy]}</td>
-                    `;
+                    if (entry.isEmpty) {
+                        tr.innerHTML = `
+                            <td style="padding: 10px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
+                            <td style="padding: 10px; font-weight: bold; color: #64748b; text-align: center;">-</td>
+                            <td style="padding: 10px; text-align: right; font-size: 1.15rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: #64748b;">-</td>
+                        `;
+                    } else {
+                        tr.innerHTML = `
+                            <td style="padding: 10px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
+                            <td style="padding: 10px; font-weight: bold; color: white;">
+                                <span style="display:inline-flex; align-items:center; margin-right:8px; vertical-align: middle;">
+                                    ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(255, 255, 255, 0.8)'}; border-radius: 50%; display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.1rem;">${entry.icon || 'ha.png'}</span>`}
+                                </span> <span style="font-size: 1rem;">${entry.name}</span>
+                            </td>
+                            <td style="padding: 10px; text-align: right; font-size: 1.15rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: ${currentLeaderboardMode === 'streak' ? '#4ade80' : '#3b82f6'};">${entry[orderBy]}</td>
+                        `;
+                    }
                     tbody.appendChild(tr);
                 });
                 

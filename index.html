@@ -117,23 +117,23 @@
         </div>
 
         <!-- Record (Ranking) Screen -->
-        <div id="record-screen" class="screen" style="padding-top: 80px; align-items: center; justify-content: flex-start; overflow-y: auto;">
+        <div id="record-screen" class="screen" style="position: fixed; display: block; text-align: center; padding-top: 40px; padding-bottom: 15px; overflow-y: auto; overflow-x: hidden; z-index: 50;">
             <button id="record-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
 
-            <h2 class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">オンラインランキング</h2>
-            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; padding: 0 20px; margin-bottom: 60px;">
+            <h2 class="category-title" style="margin-bottom: 10px; font-size: 2rem;">オンラインランキング</h2>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 95%; max-width: 1000px; padding: 0; margin: 0 auto 20px auto;">
 
                 <!-- Right: Global Leaderboard Section -->
                 <div id="global-ranking-section" style="flex: 1; width: 100%; display: flex; flex-direction: column;">
                     
                     <!-- Ranking Toggle Buttons -->
-                    <div style="display: flex; justify-content: center; margin-bottom: 15px; gap: 10px;">
-                        <button id="ranking-streak-btn" class="active" style="padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid #fbbf24; background: rgba(251, 191, 36, 0.2); color: #fbbf24; cursor: pointer;">🌍 CPU連勝</button>
-                        <button id="ranking-rate-btn" style="padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; cursor: pointer;">⚔️ オンラインレート</button>
+                    <div style="display: flex; justify-content: center; margin-bottom: 10px; gap: 10px;">
+                        <button id="ranking-streak-btn" class="active" style="padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid #fbbf24; background: rgba(251, 191, 36, 0.2); color: #fbbf24; cursor: pointer;">🌍 CPU連勝</button>
+                        <button id="ranking-rate-btn" style="padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; cursor: pointer;">⚔️ オンラインレート</button>
                     </div>
                     
-                    <div id="global-leaderboard-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 20px; flex-grow: 1;">
-                        <div id="leaderboard-loading" data-i18n="loading" style="text-align: center; color: #94a3b8; padding: 40px 0;">読み込み中...</div>
+                    <div id="global-leaderboard-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 10px; flex-grow: 1;">
+                        <div id="leaderboard-loading" data-i18n="loading" style="text-align: center; color: #94a3b8; padding: 20px 0;">読み込み中...</div>
                         
                         <table id="leaderboard-table" style="width: 100%; border-collapse: collapse; display: none; color: white;">
                             <thead>
