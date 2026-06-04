@@ -87,7 +87,7 @@
                 </div>
 
                 <!-- Right: Global Leaderboard Section -->
-                <div id="global-ranking-section" style="flex: 1; min-width: 300px; max-width: 500px; display: none; flex-direction: column;">
+                <div id="global-ranking-section" style="flex: 1; min-width: 300px; max-width: 500px; display: flex; flex-direction: column;">
                     <h3 data-i18n="global_ranking_title" style="color: #fbbf24; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 2px;">🌍 CPU連勝 世界ランキング 🌍</h3>
                     <div id="global-leaderboard-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 20px; flex-grow: 1;">
                         <div id="leaderboard-loading" data-i18n="loading" style="text-align: center; color: #94a3b8; padding: 40px 0;">読み込み中...</div>
@@ -111,9 +111,11 @@
 
         <!-- How to Play Screen -->
         <div id="how-to-play-screen" class="screen" style="display: flex; flex-direction: column; align-items: center; padding: 40px 0; overflow-y: auto;">
-            <button id="how-to-back-btn" data-i18n="return_btn" class="title-return-btn" style="z-index: 10;">戻る</button>
             <div style="margin: auto 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
-            <h2 data-i18n="rules_btn" style="color: white; font-size: 2.2rem; margin-bottom: 12px; text-shadow: 0 0 10px rgba(255,255,255,0.3);">EAT10とは？</h2>
+            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 12px;">
+                <button id="how-to-back-btn" data-i18n="return_btn" class="title-return-btn" style="position: static; margin-bottom: 15px; z-index: 10;">戻る</button>
+                <h2 data-i18n="rules_btn" style="color: white; font-size: 2.2rem; margin: 0; text-shadow: 0 0 10px rgba(255,255,255,0.3);">EAT10とは？</h2>
+            </div>
             
             <p data-i18n="rules_intro" style="color: #fbbf24; font-size: 1.2rem; text-align: center; font-weight: bold; margin-top: 0; margin-bottom: 20px; margin-left: auto; margin-right: auto; line-height: 1.4; max-width: 90%;">EAT10は食物連鎖を元にした生物バトルゲーム！！<br>数字の強さだけが全てじゃない。ターンを重ねるごとに心理戦に変わっていく弱肉強食ゲーム！！</p>
 

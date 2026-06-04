@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    window.updateAllUIText();
+    document.documentElement.lang = window.currentLang; window.updateAllUIText();
     // --- State ---
     let playerHand = [];
     let cpuHand = [];
@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.alignItems = 'center';
         overlay.style.justifyContent = 'center';
         
-        let html = `<div style="background: rgba(30, 41, 59, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); max-width: 90vw; width: 600px;">
+        let html = `<div style="background: rgba(30, 41, 59, 0.95); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); max-width: 90vw; width: 600px; max-height: 80vh; overflow-y: auto;">
             <h2 style="color: white; margin-bottom: 20px; text-align: center;">${titleText}</h2>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;">`;
             
@@ -1142,8 +1142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         ui.deckListGrid.innerHTML = '';
         
-        // Change layout for English
-        if (window.currentLang === 'en') {
+        // Change layout for English, but keep 1fr on mobile
+        if (window.innerWidth <= 700) {
+            ui.deckListGrid.style.gridTemplateColumns = '1fr';
+            ui.deckListGrid.style.maxWidth = '100%';
+        } else if (window.currentLang === 'en') {
             ui.deckListGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
             ui.deckListGrid.style.maxWidth = '1100px';
         } else {

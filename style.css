@@ -1059,9 +1059,15 @@ h1, h2, h3, .score, .round-indicator, .score-value, .history-label {
     
     /* Deck Builder and Card List */
     .deck-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: 1fr !important;
         max-height: 60vh;
         overflow-y: auto;
+    }
+    
+    /* Force vertical column for English translation to avoid layout breaks */
+    html:lang(en) #deck-list-grid, html.translated-ltr #deck-list-grid,
+    html:lang(en) .deck-grid, html.translated-ltr .deck-grid {
+        grid-template-columns: 1fr !important;
     }
     
     /* Battle Settings Mode Buttons */
@@ -1072,10 +1078,11 @@ h1, h2, h3, .score, .round-indicator, .score-value, .history-label {
     
     /* Hover Info Panel on Mobile */
     .hover-info-panel {
-        top: 20px;
+        top: 35%;
+        bottom: auto;
         left: 50%;
         right: auto;
-        transform: translateX(-50%);
+        transform: translateX(-50%) translateY(-50%);
         height: auto;
         z-index: 200;
         pointer-events: none;
