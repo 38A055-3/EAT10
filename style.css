@@ -1078,11 +1078,11 @@ h1, h2, h3, .score, .round-indicator, .score-value, .history-label {
     
     /* Hover Info Panel on Mobile */
     .hover-info-panel {
-        top: 35%;
+        top: 120px;
         bottom: auto;
         left: 50%;
         right: auto;
-        transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%);
         height: auto;
         z-index: 200;
         pointer-events: none;
@@ -1648,7 +1648,7 @@ h1, h2, h3, .score, .round-indicator, .score-value, .history-label {
 
 .title-return-btn {
     position: absolute;
-    top: 20px;
+    top: 50px;
     left: 20px;
     background: rgba(17, 24, 39, 0.6);
     color: white;
