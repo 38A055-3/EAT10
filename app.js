@@ -254,7 +254,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let editingDeckIndex = -1;
     let deckBuilderCounts = {};
 
+    function generateUID() {
+        if (window.crypto && window.crypto.randomUUID) {
+            return window.crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+    
     let playerName = localStorage.getItem('eat10_player_name') || window.t('player_name_fallback');
+    
+    let playerUid = localStorage.getItem('eat10_player_uid');
+    if (!playerUid) {
+        playerUid = generateUID();
+        localStorage.setItem('eat10_player_uid', playerUid);
+        // Clean up old name-based record to avoid duplicates during migration
+        if (typeof firebase !== 'undefined' && firebase.database) {
+            const db = firebase.database();
+            const oldKey = encodeURIComponent(playerName);
+            if (stats.maxWinStreak > 0) db.ref('leaderboard/' + oldKey).remove().catch(e=>console.error(e));
+            if (stats.rating && stats.rating !== 1500) db.ref('rate_leaderboard/' + oldKey).remove().catch(e=>console.error(e));
+        }
+    }
+
     const playerNameInput = document.getElementById('player-name-input');
     const playerIconBtn = document.getElementById('player-icon-btn');
     const playerNameTooltip = document.getElementById('player-name-tooltip');
@@ -266,6 +290,13 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('eat10_player_name', playerName);
             if (playerIconBtn) playerIconBtn.title = playerName;
             if (playerNameTooltip) playerNameTooltip.innerText = playerName;
+            
+            // Sync name change to leaderboard with debounce
+            if (window.nameUpdateTimeout) clearTimeout(window.nameUpdateTimeout);
+            window.nameUpdateTimeout = setTimeout(() => {
+                if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+                if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+            }, 1000);
         });
     }
 
@@ -283,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'rgba(255, 255, 255, 0.8)'   // 白 (White)
     ];
     let playerIcon = localStorage.getItem('eat10_player_icon') || 'ha.png';
-    let playerColor = localStorage.getItem('eat10_player_color') || 'rgba(0,0,0,0.5)';
+    let playerColor = localStorage.getItem('eat10_player_color') || 'rgba(255, 255, 255, 0.8)';
     const iconSelectionContainer = document.getElementById('icon-selection-container');
     const colorSelectionContainer = document.getElementById('color-selection-container');
     
@@ -330,6 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Array.from(iconSelectionContainer.children).forEach((child, index) => {
                     child.style.border = availableIcons[index] === playerIcon ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
                 });
+                if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+                if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
             });
             iconSelectionContainer.appendChild(btn);
         });
@@ -360,6 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Array.from(colorSelectionContainer.children).forEach((child, index) => {
                     child.style.border = availableColors[index] === playerColor ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
                 });
+                if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+                if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
             });
             colorSelectionContainer.appendChild(btn);
         });
@@ -1790,7 +1825,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function submitGlobalScore(name, streak, icon, color) {
         if (!name || streak <= 0) return;
-        const playerRef = db.ref('leaderboard/' + encodeURIComponent(name));
+        const playerRef = db.ref('leaderboard/' + playerUid);
         
         playerRef.once('value').then((snapshot) => {
             const existingData = snapshot.val();
@@ -1798,9 +1833,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 playerRef.set({
                     name: name,
                     icon: icon || 'ha.png',
-                    color: color || 'rgba(0,0,0,0.5)',
+                    color: color || 'rgba(255, 255, 255, 0.8)',
                     streak: streak,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+            } else if (existingData && (existingData.name !== name || existingData.icon !== icon || existingData.color !== color)) {
+                playerRef.update({
+                    name: name,
+                    icon: icon || 'ha.png',
+                    color: color || 'rgba(255, 255, 255, 0.8)'
                 });
             }
         }).catch(err => console.error("Firebase update failed:", err));
@@ -1808,12 +1849,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function submitGlobalRatingScore(name, rating, icon, color) {
         if (!name || rating <= 0) return;
-        const playerRef = db.ref('rate_leaderboard/' + encodeURIComponent(name));
+        const playerRef = db.ref('rate_leaderboard/' + playerUid);
         
         playerRef.set({
             name: name,
             icon: icon || 'ha.png',
-            color: color || 'rgba(0,0,0,0.5)',
+            color: color || 'rgba(255, 255, 255, 0.8)',
             rating: Math.floor(rating),
             timestamp: firebase.database.ServerValue.TIMESTAMP
         }).catch(err => console.error("Firebase rating update failed:", err));
@@ -1879,7 +1920,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td style="padding: 12px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
                         <td style="padding: 12px; font-weight: bold; color: white;">
                             <span style="display:inline-flex; align-items:center; margin-right:8px; vertical-align: middle;">
-                                ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(0,0,0,0.5)'}; border-radius: 50%; display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.2rem;">${entry.icon || 'ha.png'}</span>`}
+                                ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(255, 255, 255, 0.8)'}; border-radius: 50%; display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.2rem;">${entry.icon || 'ha.png'}</span>`}
                             </span> ${entry.name}
                         </td>
                         <td style="padding: 12px; text-align: right; font-size: 1.2rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: ${currentLeaderboardMode === 'streak' ? '#4ade80' : '#3b82f6'};">${entry[orderBy]}</td>

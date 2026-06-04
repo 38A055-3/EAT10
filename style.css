@@ -2307,3 +2307,9 @@ body.four-player-layout #cpu2-area .deck-label {
 body.four-player-layout #cpu2-area .history-cards {
     flex-direction: row-reverse !important;
 }
+
+@media (max-width: 768px) {
+    #color-selection-container {
+        max-width: 240px !important;
+    }
+}
