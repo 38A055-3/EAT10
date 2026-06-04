@@ -12,6 +12,21 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 </head>
 <body>
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            var errorDiv = document.createElement("div");
+            errorDiv.style.position = "fixed";
+            errorDiv.style.top = "10px";
+            errorDiv.style.left = "10px";
+            errorDiv.style.backgroundColor = "rgba(255,0,0,0.8)";
+            errorDiv.style.color = "white";
+            errorDiv.style.padding = "20px";
+            errorDiv.style.zIndex = "999999";
+            errorDiv.innerHTML = "Error: " + msg + "<br>Line: " + lineNo;
+            document.body.appendChild(errorDiv);
+            return false;
+        };
+    </script>
     <div id="title-bg-animation" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none; overflow: hidden; transition: opacity 0.5s;"></div>
     <div id="app" class="app-container">
         <!-- Title Screen -->
@@ -25,11 +40,12 @@
                 </svg>
                 Instagram
             </a>
-            <img src="title.png" class="title-image animate-logo" alt="EAT10 Logo" style="margin-bottom: 20px; position: relative; z-index: 1;">
-            <div style="margin: auto 0; position: relative; z-index: 1; text-align: center; transform: translateY(-3vh);">
-                <input type="text" id="player-name-input" data-i18n="player_name_placeholder" placeholder="プレイヤー名" value="プレイヤー名" maxlength="10" style="padding: 10px 20px; font-size: 1.2rem; border-radius: 8px; border: 2px solid rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); color: white; text-align: center; width: 220px; outline: none; font-weight: bold; font-family: 'Inter', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <img src="title.png" class="title-image animate-logo" alt="EAT10 Logo" style="margin-bottom: 5px; position: relative; z-index: 1;">
+            <div style="margin: auto 0; position: relative; z-index: 1; text-align: center; transform: translateY(-70px);">
+                <button id="player-icon-btn" style="background: rgba(0,0,0,0.5); border: 2px solid rgba(168, 85, 247, 0.5); border-radius: 50%; width: 130px; height: 130px; font-size: 1.5rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 5px; transition: transform 0.2s; overflow: hidden; position: relative;" onmouseover="this.style.transform='scale(1.1)'; const tt=document.getElementById('player-name-tooltip'); if(tt){tt.style.opacity='1'; tt.style.transform='translateX(-50%) translateY(0)';}" onmouseout="this.style.transform='scale(1)'; const tt=document.getElementById('player-name-tooltip'); if(tt){tt.style.opacity='0'; tt.style.transform='translateX(-50%) translateY(10px)';}"></button>
+                <div id="player-name-tooltip" style="position: absolute; top: -40px; left: 50%; transform: translateX(-50%) translateY(10px); color: white; font-size: 1.3rem; font-weight: bold; pointer-events: none; opacity: 0; transition: all 0.2s ease-out; white-space: nowrap; z-index: 10; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">プレイヤー名</div>
             </div>
-            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; margin-bottom: 5vh; position: relative; z-index: 1;">
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; margin-bottom: 2vh; position: relative; z-index: 1; transform: translateY(-50px);">
                 <button id="title-battle-btn" data-i18n="battle_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px;">バトル</button>
                 <button id="title-deck-btn" data-i18n="deck_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);">デッキ</button>
                 <button id="title-record-btn" data-i18n="record_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);">記録</button>
@@ -51,52 +67,80 @@
                 <button id="deck-list-back-btn" data-i18n="return_btn" class="secondary-btn" style="padding: 15px 80px; font-size: 1.5rem; border: none; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; background: #475569; transition: background 0.2s;">戻る</button>
             </div>
         </div>
+        <!-- My Room Screen -->
+        <div id="my-room-screen" class="screen" style="padding-top: 40px; padding-bottom: 20px; align-items: center; justify-content: flex-start; overflow-y: auto;">
+            <button id="my-room-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+            
+            <div style="text-align: center; margin-bottom: 35px; margin-top: 20px;">
+                <input type="text" id="player-name-input" data-i18n="player_name_placeholder" placeholder="プレイヤー名" value="プレイヤー名" maxlength="10" style="padding: 10px 20px; font-size: 1.4rem; border-radius: 8px; border: 2px solid rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); color: white; text-align: center; width: 250px; outline: none; font-weight: bold; font-family: 'Inter', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 35px;">
+                
+                <h3 style="color: white; font-size: 1.2rem; margin-bottom: 10px;">キャラクター</h3>
+                <div id="icon-selection-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 340px; margin: 0 auto;">
+                    <!-- Icons will be injected here by app.js -->
+                </div>
+                
+                <h3 style="color: white; font-size: 1.2rem; margin-top: 15px; margin-bottom: 10px;">背景色</h3>
+                <div id="color-selection-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 600px; margin: 0 auto;">
+                    <!-- Colors will be injected here by app.js -->
+                </div>
+            </div>
 
-        <!-- Record Screen -->
+            <div style="width: 100%; max-width: 600px; padding: 0 20px; margin-bottom: 10px;">
+                <h3 data-i18n="battle_record_title" style="color: white; font-size: 1.3rem; text-align: center; margin-bottom: 10px; letter-spacing: 2px;">戦績記録</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span data-i18n="total_battles" style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">総バトル数</span>
+                        <span id="stat-total-battles" style="font-size: 1.5rem; color: white; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                    </div>
+                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span data-i18n="total_wins" style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">勝利数</span>
+                        <span id="stat-wins" style="font-size: 1.5rem; color: #10b981; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                    </div>
+                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span data-i18n="total_losses" style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">敗北数</span>
+                        <span id="stat-losses" style="font-size: 1.5rem; color: #f43f5e; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                    </div>
+                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span data-i18n="total_draws" style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">引き分け数</span>
+                        <span id="stat-draws" style="font-size: 1.5rem; color: #fbbf24; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                    </div>
+                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span data-i18n="max_streak" style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">最大連勝数</span>
+                        <span id="stat-max-streak" style="font-size: 1.5rem; color: #a855f7; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                    </div>
+                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">現在のレート</span>
+                        <span id="stat-rating" style="font-size: 1.5rem; color: #3b82f6; font-weight: 800; font-family: 'Outfit', sans-serif;">1500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Record (Ranking) Screen -->
         <div id="record-screen" class="screen" style="padding-top: 80px; align-items: center; justify-content: flex-start; overflow-y: auto;">
             <button id="record-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
 
-            <h2 data-i18n="record_title" class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">記録</h2>
-            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 40px; width: 100%; max-width: 1200px; padding: 0 20px; margin-bottom: 60px;">
-                
-                <!-- Left: Stats Section -->
-                <div style="flex: 1; min-width: 300px; max-width: 500px; display: flex; flex-direction: column;">
-                    <h3 data-i18n="battle_record_title" style="color: white; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 2px;">戦績記録</h3>
-                    <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
-                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                            <span data-i18n="total_battles" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">総バトル数</span>
-                            <span id="stat-total-battles" style="font-size: 2rem; color: white; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
-                        </div>
-                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                            <span data-i18n="total_wins" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">勝利数</span>
-                            <span id="stat-wins" style="font-size: 2rem; color: #10b981; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
-                        </div>
-                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                            <span data-i18n="total_losses" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">敗北数</span>
-                            <span id="stat-losses" style="font-size: 2rem; color: #f43f5e; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
-                        </div>
-                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                            <span data-i18n="total_draws" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">引き分け数</span>
-                            <span id="stat-draws" style="font-size: 2rem; color: #fbbf24; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
-                        </div>
-                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                            <span data-i18n="max_streak" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">最大連勝数</span>
-                            <span id="stat-max-streak" style="font-size: 2rem; color: #a855f7; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
-                        </div>
-                    </div>
-                </div>
+            <h2 class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">オンラインランキング</h2>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; padding: 0 20px; margin-bottom: 60px;">
 
                 <!-- Right: Global Leaderboard Section -->
-                <div id="global-ranking-section" style="flex: 1; min-width: 300px; max-width: 500px; display: flex; flex-direction: column;">
-                    <h3 data-i18n="global_ranking_title" style="color: #fbbf24; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 2px;">🌍 CPU連勝 世界ランキング 🌍</h3>
+                <div id="global-ranking-section" style="flex: 1; width: 100%; display: flex; flex-direction: column;">
+                    
+                    <!-- Ranking Toggle Buttons -->
+                    <div style="display: flex; justify-content: center; margin-bottom: 15px; gap: 10px;">
+                        <button id="ranking-streak-btn" class="active" style="padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid #fbbf24; background: rgba(251, 191, 36, 0.2); color: #fbbf24; cursor: pointer;">🌍 CPU連勝</button>
+                        <button id="ranking-rate-btn" style="padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; cursor: pointer;">⚔️ オンラインレート</button>
+                    </div>
+                    
                     <div id="global-leaderboard-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 20px; flex-grow: 1;">
                         <div id="leaderboard-loading" data-i18n="loading" style="text-align: center; color: #94a3b8; padding: 40px 0;">読み込み中...</div>
+                        
                         <table id="leaderboard-table" style="width: 100%; border-collapse: collapse; display: none; color: white;">
                             <thead>
                                 <tr style="border-bottom: 2px solid rgba(251, 191, 36, 0.3);">
                                     <th data-i18n="rank_col" style="padding: 10px; text-align: center; width: 60px; color: #fbbf24;">順位</th>
                                     <th data-i18n="name_col" style="padding: 10px; text-align: left; color: #fbbf24;">プレイヤー名</th>
-                                    <th data-i18n="streak_col" style="padding: 10px; text-align: right; color: #fbbf24;">連勝数</th>
+                                    <th id="leaderboard-value-col" style="padding: 10px; text-align: right; color: #fbbf24;">連勝数</th>
                                 </tr>
                             </thead>
                             <tbody id="leaderboard-tbody">
@@ -345,7 +389,7 @@
                 <!-- CPU1 Area -->
                 <div id="cpu1-area" class="player-area cpu-area">
                     <div class="score-container">
-                        <span id="cpu1-name-display" class="player-label">CPU 1</span>
+                        <span id="cpu1-name-display" class="player-label"><span id="cpu1-icon-display">🤖</span> CPU 1</span>
                         <span id="cpu1-score" class="score">0</span>
                     </div>
                     <div class="cards-layout">
@@ -373,7 +417,7 @@
                 <!-- CPU2 Area -->
                 <div id="cpu2-area" class="player-area cpu-area hidden">
                     <div class="score-container">
-                        <span id="cpu2-name-display" class="player-label">CPU 2</span>
+                        <span id="cpu2-name-display" class="player-label"><span id="cpu2-icon-display">🤖</span> CPU 2</span>
                         <span id="cpu2-score" class="score">0</span>
                     </div>
                     <div class="cards-layout">
@@ -401,7 +445,7 @@
                 <!-- CPU3 Area -->
                 <div id="cpu3-area" class="player-area cpu-area hidden">
                     <div class="score-container">
-                        <span id="cpu3-name-display" class="player-label">CPU 3</span>
+                        <span id="cpu3-name-display" class="player-label"><span id="cpu3-icon-display">🤖</span> CPU 3</span>
                         <span id="cpu3-score" class="score">0</span>
                     </div>
                     <div class="cards-layout">
@@ -464,7 +508,7 @@
             <!-- Player Area -->
             <div class="player-area my-area">
                 <div class="score-container">
-                    <span id="player-name-display" class="player-label">YOU</span>
+                    <span id="player-name-display" class="player-label"><span id="player-icon-display">👤</span> YOU</span>
                     <span id="player-score" class="score">0</span>
                 </div>
                 <div class="cards-layout">

@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let conn = null;
     let isHost = false;
     let opponentName = 'CPU';
+    let opponentIcon = '🤖';
+    let opponentRating = 1500;
     let gameSeed = Math.floor(Math.random() * 1000000);
     
     function seededRandom() {
@@ -143,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const screens = {
         title: document.getElementById('title-screen'),
+        myRoom: document.getElementById('my-room-screen'),
         format: document.getElementById('format-screen'),
         guestWait: document.getElementById('guest-wait-screen'),
         randomMatch: document.getElementById('random-match-screen'),
@@ -253,11 +256,119 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let playerName = localStorage.getItem('eat10_player_name') || window.t('player_name_fallback');
     const playerNameInput = document.getElementById('player-name-input');
+    const playerIconBtn = document.getElementById('player-icon-btn');
+    const playerNameTooltip = document.getElementById('player-name-tooltip');
+    
     if (playerNameInput) {
         playerNameInput.value = playerName;
         playerNameInput.addEventListener('input', (e) => {
             playerName = e.target.value.trim() || window.t('player_name_fallback');
             localStorage.setItem('eat10_player_name', playerName);
+            if (playerIconBtn) playerIconBtn.title = playerName;
+            if (playerNameTooltip) playerNameTooltip.innerText = playerName;
+        });
+    }
+
+    const availableIcons = ['ha.png', 'tyo.png', 'ku.png', 'ka.png', 'ne.png', 'he.png', 'ne2.png', 'i.png', 'ku2.png', 'hi.png'];
+    const availableColors = [
+        'rgba(239, 68, 68, 0.8)',    // 赤 (Red)
+        'rgba(59, 130, 246, 0.8)',   // 青 (Blue)
+        'rgba(234, 179, 8, 0.8)',    // 黄 (Yellow)
+        'rgba(34, 197, 94, 0.8)',    // 緑 (Green)
+        'rgba(168, 85, 247, 0.8)',   // 紫 (Purple)
+        'rgba(249, 115, 22, 0.8)',   // オレンジ (Orange)
+        'rgba(14, 165, 233, 0.8)',   // 水色 (Light Blue)
+        'rgba(236, 72, 153, 0.8)',   // ピンク (Pink)
+        'rgba(0, 0, 0, 0.8)',        // 黒 (Black)
+        'rgba(255, 255, 255, 0.8)'   // 白 (White)
+    ];
+    let playerIcon = localStorage.getItem('eat10_player_icon') || 'ha.png';
+    let playerColor = localStorage.getItem('eat10_player_color') || 'rgba(0,0,0,0.5)';
+    const iconSelectionContainer = document.getElementById('icon-selection-container');
+    const colorSelectionContainer = document.getElementById('color-selection-container');
+    
+    if (playerIconBtn) {
+        playerIconBtn.title = playerName;
+        if (playerNameTooltip) playerNameTooltip.innerText = playerName;
+        playerIconBtn.style.background = playerColor;
+        playerIconBtn.innerHTML = `<img src="${playerIcon}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; transform: scale(1.15);">`;
+        playerIconBtn.addEventListener('click', () => {
+            switchScreen('myRoom');
+        });
+    }
+
+    function updateIconSelectionBackgrounds() {
+        if (!iconSelectionContainer) return;
+        Array.from(iconSelectionContainer.children).forEach(child => {
+            child.style.background = playerColor;
+        });
+    }
+
+    if (iconSelectionContainer) {
+        iconSelectionContainer.innerHTML = '';
+        availableIcons.forEach(iconPath => {
+            const btn = document.createElement('div');
+            btn.style.width = '60px';
+            btn.style.height = '60px';
+            btn.style.borderRadius = '50%';
+            btn.style.cursor = 'pointer';
+            btn.style.border = playerIcon === iconPath ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
+            btn.style.background = playerColor;
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.overflow = 'hidden';
+            btn.style.transition = 'background 0.2s';
+            btn.innerHTML = `<img src="${iconPath}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);">`;
+            
+            btn.addEventListener('click', () => {
+                playerIcon = iconPath;
+                localStorage.setItem('eat10_player_icon', playerIcon);
+                if (playerIconBtn) {
+                    playerIconBtn.innerHTML = `<img src="${playerIcon}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; transform: scale(1.15);">`;
+                }
+                Array.from(iconSelectionContainer.children).forEach((child, index) => {
+                    child.style.border = availableIcons[index] === playerIcon ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
+                });
+            });
+            iconSelectionContainer.appendChild(btn);
+        });
+    }
+
+    if (colorSelectionContainer) {
+        colorSelectionContainer.innerHTML = '';
+        availableColors.forEach(colorVal => {
+            const btn = document.createElement('div');
+            btn.style.width = '40px';
+            btn.style.height = '40px';
+            btn.style.borderRadius = '50%';
+            btn.style.cursor = 'pointer';
+            btn.style.background = colorVal;
+            btn.style.border = playerColor === colorVal ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
+            btn.style.transition = 'transform 0.2s';
+            
+            btn.addEventListener('mouseover', () => btn.style.transform = 'scale(1.1)');
+            btn.addEventListener('mouseout', () => btn.style.transform = 'scale(1)');
+            
+            btn.addEventListener('click', () => {
+                playerColor = colorVal;
+                localStorage.setItem('eat10_player_color', playerColor);
+                if (playerIconBtn) {
+                    playerIconBtn.style.background = playerColor;
+                }
+                updateIconSelectionBackgrounds();
+                Array.from(colorSelectionContainer.children).forEach((child, index) => {
+                    child.style.border = availableColors[index] === playerColor ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
+                });
+            });
+            colorSelectionContainer.appendChild(btn);
+        });
+    }
+
+    const myRoomBackBtn = document.getElementById('my-room-back-btn');
+    if (myRoomBackBtn) {
+        myRoomBackBtn.addEventListener('click', () => {
+            switchScreen('title');
         });
     }
 
@@ -272,10 +383,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedFormat = 'single';
     let selectedPlayerCount = 2;
 
-    let stats = { totalBattles: 0, wins: 0, losses: 0, draws: 0, maxWinStreak: 0 };
+    let stats = { totalBattles: 0, wins: 0, losses: 0, draws: 0, maxWinStreak: 0, rating: 1500 };
     const savedStats = localStorage.getItem('eat10_stats');
     if (savedStats) {
-        try { stats = JSON.parse(savedStats); } catch(e) {}
+        try { 
+            stats = JSON.parse(savedStats); 
+            if (typeof stats.rating === 'undefined') stats.rating = 1500;
+        } catch(e) {}
     }
 
     function saveStats() {
@@ -301,7 +415,54 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('stat-losses').textContent = stats.losses;
             document.getElementById('stat-draws').textContent = stats.draws;
             document.getElementById('stat-max-streak').textContent = stats.maxWinStreak;
+            
+            const statRatingEl = document.getElementById('stat-rating');
+            if (statRatingEl) statRatingEl.textContent = Math.floor(stats.rating || 1500);
+            
+            // Reset to streak leaderboard on open
+            currentLeaderboardMode = 'streak';
+            updateLeaderboardToggleUI();
+            
             switchScreen('record');
+        });
+    }
+
+    let currentLeaderboardMode = 'streak'; // 'streak' or 'rate'
+    const rankingStreakBtn = document.getElementById('ranking-streak-btn');
+    const rankingRateBtn = document.getElementById('ranking-rate-btn');
+
+    function updateLeaderboardToggleUI() {
+        if (rankingStreakBtn && rankingRateBtn) {
+            if (currentLeaderboardMode === 'streak') {
+                rankingStreakBtn.style.background = 'rgba(251, 191, 36, 0.2)';
+                rankingStreakBtn.style.color = '#fbbf24';
+                rankingRateBtn.style.background = 'transparent';
+                rankingRateBtn.style.color = 'white';
+            } else {
+                rankingRateBtn.style.background = 'rgba(59, 130, 246, 0.2)';
+                rankingRateBtn.style.color = '#3b82f6';
+                rankingStreakBtn.style.background = 'transparent';
+                rankingStreakBtn.style.color = 'white';
+            }
+        }
+        fetchGlobalRanking();
+    }
+
+    if (rankingStreakBtn) {
+        rankingStreakBtn.addEventListener('click', () => {
+            if (currentLeaderboardMode !== 'streak') {
+                currentLeaderboardMode = 'streak';
+                updateLeaderboardToggleUI();
+            }
+        });
+    }
+    
+    if (rankingRateBtn) {
+        rankingRateBtn.addEventListener('click', () => {
+            if (currentLeaderboardMode !== 'rate') {
+                currentLeaderboardMode = 'rate';
+                updateLeaderboardToggleUI();
+            }
         });
     }
 
@@ -930,6 +1091,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const handshakeData = {
             type: 'init',
             name: playerName,
+            icon: playerIcon,
+            rating: stats.rating || 1500,
             seed: gameSeed
         };
         if (selectedFormat === 'random' && currentMode === 'deck') {
@@ -942,6 +1105,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleNetworkData(data) {
         if (data.type === 'init') {
             opponentName = data.name || 'Opponent';
+            opponentIcon = data.icon || 'ha.png';
+            opponentRating = data.rating || 1500;
             if (data.deck) opponentCustomDeck = data.deck;
             if (data.seed !== undefined && !isHost) {
                 gameSeed = data.seed;
@@ -1623,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const db = firebase.database();
 
-    function submitGlobalScore(name, streak) {
+    function submitGlobalScore(name, streak, icon, color) {
         if (!name || streak <= 0) return;
         const playerRef = db.ref('leaderboard/' + encodeURIComponent(name));
         
@@ -1632,6 +1797,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!existingData || streak > existingData.streak) {
                 playerRef.set({
                     name: name,
+                    icon: icon || 'ha.png',
+                    color: color || 'rgba(0,0,0,0.5)',
                     streak: streak,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
@@ -1639,10 +1806,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(err => console.error("Firebase update failed:", err));
     }
 
+    function submitGlobalRatingScore(name, rating, icon, color) {
+        if (!name || rating <= 0) return;
+        const playerRef = db.ref('rate_leaderboard/' + encodeURIComponent(name));
+        
+        playerRef.set({
+            name: name,
+            icon: icon || 'ha.png',
+            color: color || 'rgba(0,0,0,0.5)',
+            rating: Math.floor(rating),
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).catch(err => console.error("Firebase rating update failed:", err));
+    }
+
     function fetchGlobalRanking() {
         const loadingEl = document.getElementById('leaderboard-loading');
         const tableEl = document.getElementById('leaderboard-table');
         const tbody = document.getElementById('leaderboard-tbody');
+        const valueCol = document.getElementById('leaderboard-value-col');
         
         if (!loadingEl || !tableEl || !tbody) return;
         
@@ -1651,10 +1832,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Push local max streak if exists
         if (stats.maxWinStreak > 0) {
-            submitGlobalScore(playerName, stats.maxWinStreak);
+            submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+        }
+        if (stats.rating && stats.rating !== 1500) {
+            submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
         }
         
-        db.ref('leaderboard').orderByChild('streak').limitToLast(10).once('value')
+        if (valueCol) {
+            valueCol.textContent = currentLeaderboardMode === 'streak' ? window.t('streak_col') : 'レート';
+        }
+        
+        const dbPath = currentLeaderboardMode === 'streak' ? 'leaderboard' : 'rate_leaderboard';
+        const orderBy = currentLeaderboardMode === 'streak' ? 'streak' : 'rating';
+        
+        db.ref(dbPath).orderByChild(orderBy).limitToLast(10).once('value')
             .then((snapshot) => {
                 let data = [];
                 snapshot.forEach((childSnapshot) => {
@@ -1662,7 +1853,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 // Sort descending (Firebase returns ascending when using orderByChild)
-                data.sort((a, b) => b.streak - a.streak);
+                data.sort((a, b) => b[orderBy] - a[orderBy]);
                 
                 tbody.innerHTML = '';
                 
@@ -1686,8 +1877,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     tr.innerHTML = `
                         <td style="padding: 12px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
-                        <td style="padding: 12px; font-weight: bold; color: white;">${entry.name}</td>
-                        <td style="padding: 12px; text-align: right; font-size: 1.2rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: #4ade80;">${entry.streak}</td>
+                        <td style="padding: 12px; font-weight: bold; color: white;">
+                            <span style="display:inline-flex; align-items:center; margin-right:8px; vertical-align: middle;">
+                                ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(0,0,0,0.5)'}; border-radius: 50%; display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.2rem;">${entry.icon || 'ha.png'}</span>`}
+                            </span> ${entry.name}
+                        </td>
+                        <td style="padding: 12px; text-align: right; font-size: 1.2rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: ${currentLeaderboardMode === 'streak' ? '#4ade80' : '#3b82f6'};">${entry[orderBy]}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1759,14 +1954,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cpuNameDisplays = document.querySelectorAll('.player-label');
         cpuNameDisplays.forEach(el => {
-            if (el.textContent.includes('CPU') || el.textContent.includes(opponentName)) {
+            if (el.id === 'player-name-display') {
+                const iconHtml = playerIcon.endsWith('.png') ? `<img src="${playerIcon}" style="width: 32px; height: 32px; vertical-align: middle; border-radius: 50%; object-fit: contain; transform: scale(1.15);">` : playerIcon;
+                el.innerHTML = `<span id="player-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">${iconHtml}</span> YOU`;
+            } else if (el.id === 'cpu1-name-display') {
                 if (selectedPlayerCount > 2) {
-                    if (el.id === 'cpu1-name-display') el.textContent = 'CPU 1';
-                    if (el.id === 'cpu2-name-display') el.textContent = 'CPU 2';
-                    if (el.id === 'cpu3-name-display') el.textContent = 'CPU 3';
+                    el.innerHTML = `<span id="cpu1-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">🤖</span> CPU 1`;
                 } else {
-                    el.textContent = isOnlineMode ? opponentName : 'CPU';
+                    const oppIconHtml = (opponentIcon && opponentIcon.endsWith('.png')) ? `<img src="${opponentIcon}" style="width: 32px; height: 32px; vertical-align: middle; border-radius: 50%; object-fit: contain; transform: scale(1.15);">` : (opponentIcon || '🤖');
+                    el.innerHTML = `<span id="cpu1-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">${isOnlineMode ? oppIconHtml : '🤖'}</span> ${isOnlineMode ? opponentName : 'CPU'}`;
                 }
+            } else if (el.id === 'cpu2-name-display') {
+                el.innerHTML = `<span id="cpu2-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">🤖</span> CPU 2`;
+            } else if (el.id === 'cpu3-name-display') {
+                el.innerHTML = `<span id="cpu3-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">🤖</span> CPU 3`;
             }
         });
 
@@ -3041,6 +3242,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         stats.totalBattles++;
+        
+        // --- Elo Rating Logic for Online Matches ---
+        if (isOnlineMode) {
+            const K = 32;
+            const expectedScore = 1 / (1 + Math.pow(10, (opponentRating - stats.rating) / 400));
+            let actualScore = 0.5; // Draw
+            if (playerScore > maxCpuScore) {
+                actualScore = 1.0; // Win
+            } else if (maxCpuScore > playerScore) {
+                actualScore = 0.0; // Lose
+            }
+            
+            stats.rating = Math.max(0, Math.floor(stats.rating + K * (actualScore - expectedScore)));
+            submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+            saveStats();
+        }
+        
         if (playerScore > maxCpuScore) {
             stats.wins++;
         } else if (maxCpuScore > playerScore) {
@@ -3054,7 +3272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 winStreakCount++;
                 if (winStreakCount > stats.maxWinStreak) {
                     stats.maxWinStreak = winStreakCount;
-                    submitGlobalScore(playerName, stats.maxWinStreak);
+                    submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
                 }
                 ui.finalTitle.textContent = 'WIN';
                 ui.finalTitle.style.color = 'var(--win-color)';
