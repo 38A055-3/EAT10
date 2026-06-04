@@ -1607,32 +1607,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Global Ranking (Local Mock) ---
-    const MOCK_LEADERBOARD_KEY = 'eat10_global_leaderboard';
+    // --- Global Ranking (Firebase) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyAzwhvtUH1qTRk3XzWLDhFwE3CC4GWCu8g",
+        authDomain: "eat10-ae108.firebaseapp.com",
+        projectId: "eat10-ae108",
+        storageBucket: "eat10-ae108.firebasestorage.app",
+        messagingSenderId: "709463551998",
+        appId: "1:709463551998:web:b4ad17988b176cdf729aaf"
+    };
     
-    // Remove previously added fake players
-    function cleanMockLeaderboard() {
-        let data = JSON.parse(localStorage.getItem(MOCK_LEADERBOARD_KEY) || '[]');
-        const fakeNames = ['CPU マスター', 'カード職人', '連勝王', '初心者', 'EAT10ファン'];
-        data = data.filter(p => !fakeNames.includes(p.name));
-        localStorage.setItem(MOCK_LEADERBOARD_KEY, JSON.stringify(data));
+    // Initialize Firebase if not already initialized
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
-    cleanMockLeaderboard();
+    const db = firebase.database();
 
     function submitGlobalScore(name, streak) {
         if (!name || streak <= 0) return;
-        let data = JSON.parse(localStorage.getItem(MOCK_LEADERBOARD_KEY) || '[]');
+        const playerRef = db.ref('leaderboard/' + encodeURIComponent(name));
         
-        const existingPlayer = data.find(p => p.name === name);
-        if (existingPlayer) {
-            if (streak > existingPlayer.streak) {
-                existingPlayer.streak = streak;
+        playerRef.once('value').then((snapshot) => {
+            const existingData = snapshot.val();
+            if (!existingData || streak > existingData.streak) {
+                playerRef.set({
+                    name: name,
+                    streak: streak,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
             }
-        } else {
-            data.push({ name: name, streak: streak });
-        }
-        
-        localStorage.setItem(MOCK_LEADERBOARD_KEY, JSON.stringify(data));
+        }).catch(err => console.error("Firebase update failed:", err));
     }
 
     function fetchGlobalRanking() {
@@ -1645,43 +1649,55 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingEl.style.display = 'block';
         tableEl.style.display = 'none';
         
-        setTimeout(() => {
-            let data = JSON.parse(localStorage.getItem(MOCK_LEADERBOARD_KEY) || '[]');
-            
-            const currentMax = stats.maxWinStreak;
-            if (currentMax > 0 && !data.some(p => p.name === playerName)) {
-                data.push({ name: playerName, streak: currentMax });
-            }
-            
-            data.sort((a, b) => b.streak - a.streak);
-            data = data.slice(0, 10);
-            
-            tbody.innerHTML = '';
-            
-            data.forEach((entry, index) => {
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-                if (entry.name === playerName) {
-                    tr.style.background = 'rgba(168, 85, 247, 0.2)'; // Highlight player
+        // Push local max streak if exists
+        if (stats.maxWinStreak > 0) {
+            submitGlobalScore(playerName, stats.maxWinStreak);
+        }
+        
+        db.ref('leaderboard').orderByChild('streak').limitToLast(10).once('value')
+            .then((snapshot) => {
+                let data = [];
+                snapshot.forEach((childSnapshot) => {
+                    data.push(childSnapshot.val());
+                });
+                
+                // Sort descending (Firebase returns ascending when using orderByChild)
+                data.sort((a, b) => b.streak - a.streak);
+                
+                tbody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    loadingEl.style.display = 'none';
+                    tableEl.style.display = 'none';
+                    return;
                 }
+
+                data.forEach((entry, index) => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                    if (entry.name === playerName) {
+                        tr.style.background = 'rgba(168, 85, 247, 0.2)'; // Highlight player
+                    }
+                    
+                    let rankText = window.t('rank_nth').replace('{0}', (index + 1));
+                    if (index === 0) rankText = window.t('rank_1');
+                    if (index === 1) rankText = window.t('rank_2');
+                    if (index === 2) rankText = window.t('rank_3');
+                    
+                    tr.innerHTML = `
+                        <td style="padding: 12px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
+                        <td style="padding: 12px; font-weight: bold; color: white;">${entry.name}</td>
+                        <td style="padding: 12px; text-align: right; font-size: 1.2rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: #4ade80;">${entry.streak}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
                 
-                let rankText = window.t('rank_nth').replace('{0}', (index + 1));
-                if (index === 0) rankText = window.t('rank_1');
-                if (index === 1) rankText = window.t('rank_2');
-                if (index === 2) rankText = window.t('rank_3');
-                
-                tr.innerHTML = `
-                    <td style="padding: 12px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
-                    <td style="padding: 12px; font-weight: bold; color: white;">${entry.name}</td>
-                    <td style="padding: 12px; text-align: right; font-size: 1.2rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: #4ade80;">${entry.streak}</td>
-                `;
-                tbody.appendChild(tr);
+                loadingEl.style.display = 'none';
+                tableEl.style.display = 'table';
+            }).catch(err => {
+                console.error("Firebase fetch failed:", err);
+                loadingEl.innerText = "読み込みエラー";
             });
-            
-            loadingEl.style.display = 'none';
-            tableEl.style.display = 'table';
-            
-        }, 300);
     }
 
     function switchScreen(screenName) {

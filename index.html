@@ -113,7 +113,6 @@
         <div id="how-to-play-screen" class="screen" style="display: flex; flex-direction: column; align-items: center; padding: 40px 0; overflow-y: auto;">
             <div style="margin: auto 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
             <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                <button id="how-to-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
                 <h2 data-i18n="rules_btn" style="color: white; font-size: 2.2rem; margin: 0; text-shadow: 0 0 10px rgba(255,255,255,0.3);">EAT10とは？</h2>
             </div>
             
@@ -153,6 +152,10 @@
                 <div style="text-align: center; margin-top: 15px;">
                     <button id="how-to-card-list-btn" data-i18n="card_list_btn" class="primary-btn battle-start-btn" style="padding: 0.8rem 2.5rem; font-size: 1.2rem; letter-spacing: 1px; background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);">カード一覧</button>
                 </div>
+            </div>
+            
+            <div style="width: 100%; display: flex; justify-content: center; margin-top: 40px; padding-bottom: 20px;">
+                <button id="how-to-back-btn" data-i18n="return_btn" class="secondary-btn" style="padding: 15px 80px; font-size: 1.5rem; border: none; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; background: #475569; transition: background 0.2s;">戻る</button>
             </div>
             </div>
         </div>
@@ -575,6 +578,10 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <script src="i18n.js?v=2"></script>
     <script src="app.js?v=2"></script>
 </body>
