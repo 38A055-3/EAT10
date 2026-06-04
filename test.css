@@ -1,0 +1,6 @@
+body.four-player-layout .player-area.my-area .score-container {
+    flex-direction: row-reverse;
+}
+body.four-player-layout .player-area.my-area .deck-label {
+    flex-direction: row-reverse !important;
+}

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAT10 - Competitive Card Game</title>
+    <meta name="description" content="A simple yet premium competitive card game where players play cards from 1 to 10 to win rounds.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+    <div id="title-bg-animation" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none; overflow: hidden; transition: opacity 0.5s;"></div>
+    <div id="app" class="app-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active new-start-screen" style="position: relative;">
+            <button id="title-settings-btn" style="position: absolute; top: 20px; left: 20px; z-index: 10; width: 45px; height: 45px; border-radius: 50%; background: white; color: #4b5563; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1) rotate(90deg)'" onmouseout="this.style.transform='scale(1) rotate(0deg)'">⚙️</button>
+            <a href="https://www.instagram.com/mia_game10?igsh=N3B6cGcxaGsxcjNy&utm_source=qr" target="_blank" style="position: absolute; top: 20px; right: 20px; z-index: 10; display: flex; align-items: center; justify-content: center; background: white; color: #e1306c; text-decoration: none; padding: 8px 15px; border-radius: 30px; font-weight: bold; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                Instagram
+            </a>
+            <img src="title.png" class="title-image animate-logo" alt="EAT10 Logo" style="margin-bottom: 20px; position: relative; z-index: 1;">
+            <div style="margin: auto 0; position: relative; z-index: 1; text-align: center; transform: translateY(-3vh);">
+                <input type="text" id="player-name-input" data-i18n="player_name_placeholder" placeholder="プレイヤー名" value="プレイヤー名" maxlength="10" style="padding: 10px 20px; font-size: 1.2rem; border-radius: 8px; border: 2px solid rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); color: white; text-align: center; width: 220px; outline: none; font-weight: bold; font-family: 'Inter', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            </div>
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; margin-bottom: 5vh; position: relative; z-index: 1;">
+                <button id="title-battle-btn" data-i18n="battle_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px;">バトル</button>
+                <button id="title-deck-btn" data-i18n="deck_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);">デッキ</button>
+                <button id="title-record-btn" data-i18n="record_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);">記録</button>
+                <button id="title-rules-btn" data-i18n="rules_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.4rem; padding: 1.2rem 1rem; letter-spacing: 1px; white-space: nowrap; background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);">EAT10とは？</button>
+            </div>
+        </div>
+
+        <!-- Deck List Screen -->
+        <div id="deck-list-screen" class="screen" style="display: block; text-align: center; padding-top: 80px; overflow-y: auto; padding-bottom: 40px;">
+            <button id="deck-list-top-back-btn" data-i18n="return_btn" class="title-return-btn hidden">戻る</button>
+            <h2 data-i18n="deck_list_title" class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">デッキ一覧</h2>
+            <div class="deck-list-grid" id="deck-list-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; width: 100%; max-width: 1300px; padding: 0 20px 40px 20px; margin: 0 auto;">
+                <!-- 10個のスロットがJSで生成される -->
+            </div>
+            <div id="deck-list-battle-btn-container" class="hidden" style="width: 100%; display: flex; justify-content: center; margin-top: 60px; padding-bottom: 40px;">
+                <button id="deck-list-start-battle-btn" data-i18n="battle_start_btn" class="start-btn" style="padding: 15px 80px; font-size: 1.8rem; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); border: none; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s;">バトル開始！</button>
+            </div>
+            <div id="deck-list-bottom-back-container" style="width: 100%; display: flex; justify-content: center; margin-top: 40px; padding-bottom: 60px;">
+                <button id="deck-list-back-btn" data-i18n="return_btn" class="secondary-btn" style="padding: 15px 80px; font-size: 1.5rem; border: none; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; background: #475569; transition: background 0.2s;">戻る</button>
+            </div>
+        </div>
+
+        <!-- Record Screen -->
+        <div id="record-screen" class="screen" style="padding-top: 80px; align-items: center; justify-content: flex-start; overflow-y: auto;">
+            <button id="record-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+
+            <h2 data-i18n="record_title" class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">記録</h2>
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 40px; width: 100%; max-width: 1200px; padding: 0 20px; margin-bottom: 60px;">
+                
+                <!-- Left: Stats Section -->
+                <div style="flex: 1; min-width: 300px; max-width: 500px; display: flex; flex-direction: column;">
+                    <h3 data-i18n="battle_record_title" style="color: white; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 2px;">戦績記録</h3>
+                    <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <span data-i18n="total_battles" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">総バトル数</span>
+                            <span id="stat-total-battles" style="font-size: 2rem; color: white; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <span data-i18n="total_wins" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">勝利数</span>
+                            <span id="stat-wins" style="font-size: 2rem; color: #10b981; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <span data-i18n="total_losses" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">敗北数</span>
+                            <span id="stat-losses" style="font-size: 2rem; color: #f43f5e; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <span data-i18n="total_draws" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">引き分け数</span>
+                            <span id="stat-draws" style="font-size: 2rem; color: #fbbf24; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <span data-i18n="max_streak" style="font-size: 1.2rem; color: #94a3b8; font-weight: bold;">最大連勝数</span>
+                            <span id="stat-max-streak" style="font-size: 2rem; color: #a855f7; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Global Leaderboard Section -->
+                <div id="global-ranking-section" style="flex: 1; min-width: 300px; max-width: 500px; display: none; flex-direction: column;">
+                    <h3 data-i18n="global_ranking_title" style="color: #fbbf24; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 2px;">🌍 CPU連勝 世界ランキング 🌍</h3>
+                    <div id="global-leaderboard-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 20px; flex-grow: 1;">
+                        <div id="leaderboard-loading" data-i18n="loading" style="text-align: center; color: #94a3b8; padding: 40px 0;">読み込み中...</div>
+                        <table id="leaderboard-table" style="width: 100%; border-collapse: collapse; display: none; color: white;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid rgba(251, 191, 36, 0.3);">
+                                    <th data-i18n="rank_col" style="padding: 10px; text-align: center; width: 60px; color: #fbbf24;">順位</th>
+                                    <th data-i18n="name_col" style="padding: 10px; text-align: left; color: #fbbf24;">プレイヤー名</th>
+                                    <th data-i18n="streak_col" style="padding: 10px; text-align: right; color: #fbbf24;">連勝数</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-tbody">
+                                <!-- JS injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- How to Play Screen -->
+        <div id="how-to-play-screen" class="screen" style="display: flex; flex-direction: column; align-items: center; padding: 40px 0; overflow-y: auto;">
+            <button id="how-to-back-btn" data-i18n="return_btn" class="title-return-btn" style="z-index: 10;">戻る</button>
+            <div style="margin: auto 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
+            <h2 data-i18n="rules_btn" style="color: white; font-size: 2.2rem; margin-bottom: 12px; text-shadow: 0 0 10px rgba(255,255,255,0.3);">EAT10とは？</h2>
+            
+            <p data-i18n="rules_intro" style="color: #fbbf24; font-size: 1.2rem; text-align: center; font-weight: bold; margin-top: 0; margin-bottom: 20px; margin-left: auto; margin-right: auto; line-height: 1.4; max-width: 90%;">EAT10は食物連鎖を元にした生物バトルゲーム！！<br>数字の強さだけが全てじゃない。ターンを重ねるごとに心理戦に変わっていく弱肉強食ゲーム！！</p>
+
+            <div style="background: rgba(30, 41, 59, 0.9); border-radius: 12px; padding: 20px 30px; max-width: 800px; width: 90%; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left;">
+                <h3 data-i18n="rules_main_point" style="color: white; font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; text-align: center; letter-spacing: 1px;">カードを同時に出して数字が大きい方の勝ち！！</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="background: #3b82f6; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.85rem;">1</div>
+                        <div data-i18n="rules_step1" style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.4; padding-top: 2px;">10枚のカードをシャッフルし、上から５枚引いて手札とする。</div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="background: #3b82f6; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.85rem;">2</div>
+                        <div data-i18n="rules_step2" style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.4; padding-top: 2px;">各プレイヤーは同時にカードを場に出す。</div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="background: #3b82f6; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.85rem;">3</div>
+                        <div data-i18n="rules_step3" style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.4; padding-top: 2px;">右上の数字が一番大きいプレイヤーに１p。<br><span style="color: #fbbf24; font-size: 0.85rem;">ただし、わざ次第で小さい数字でも勝てるようになる。</span></div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="background: #3b82f6; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.85rem;">4</div>
+                        <div data-i18n="rules_step4" style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.4; padding-top: 2px;">出したカードはお墓に行き、カードを１枚引いてターン終了。<br><span style="color: #34d399; font-weight: bold;">合計５ターンで一番ポイントを取ったプレイヤーの勝利。</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+                    <h4 data-i18n="rules_details_title" style="color: #cbd5e1; font-size: 1rem; margin-bottom: 8px; margin-top: 0;">細かいルール</h4>
+                    <ul style="color: #94a3b8; font-size: 0.85rem; line-height: 1.4; padding-left: 20px; margin-bottom: 0;">
+                        <li data-i18n="rules_detail1">同じ数字の場合DRAWとなりポイントは入らない。</li>
+                        <li data-i18n="rules_detail2">所持ポイントは０より小さい数字にならない。</li>
+                        <li data-i18n="rules_detail3">後出し系のわざ（チョウ・ネコ・イノシシ）のわざを使う順番は、数字が小さいカードから優先して使える。</li>
+                    </ul>
+                </div>
+
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="how-to-card-list-btn" data-i18n="card_list_btn" class="primary-btn battle-start-btn" style="padding: 0.8rem 2.5rem; font-size: 1.2rem; letter-spacing: 1px; background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);">カード一覧</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Card List Screen -->
+        <div id="card-list-screen" class="screen" style="padding-top: 80px; align-items: center; justify-content: flex-start; overflow-y: auto;">
+            <button id="card-list-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+            <h2 data-i18n="card_list_btn" class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">カード一覧</h2>
+            <div id="all-cards-grid" class="deck-grid" style="width: 100%; max-width: 1200px; padding: 0 20px 60px 20px;">
+                <!-- Cards injected by JS -->
+            </div>
+        </div>
+
+        <!-- Format Selection Screen -->
+        <div id="format-screen" class="screen new-start-screen">
+            <button id="format-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+            <div style="margin: auto 0; display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <h2 data-i18n="format_title" class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">プレイ形式を選択</h2>
+                <div class="mode-select-container" style="display: flex; flex-direction: column; gap: 20px;">
+                    <button id="single-format-btn" class="mode-btn" data-format="single" style="padding: 20px 40px; font-size: 1.8rem; width: 320px;">
+                        <span data-i18n="single_play">ひとりで遊ぶ</span><br><span data-i18n="single_play_desc" class="mode-desc">CPUと対戦するモード</span>
+                    </button>
+                    <button id="online-format-btn" class="mode-btn" data-format="online" style="padding: 20px 40px; font-size: 1.8rem; width: 320px;">
+                        <span data-i18n="online_play">友達と遊ぶ</span><br><span data-i18n="online_play_desc" class="mode-desc">ルームIDを使って通信対戦</span>
+                    </button>
+                    <button id="random-format-btn" class="mode-btn" data-format="random" style="padding: 20px 40px; font-size: 1.8rem; width: 320px;">
+                        <span data-i18n="random_play">だれかと遊ぶ</span><br><span data-i18n="random_play_desc" class="mode-desc">知らない人と自動マッチング</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Random Match Screen -->
+        <div id="random-match-screen" class="screen new-start-screen">
+            <button id="random-match-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+            <h2 data-i18n="random_play" class="category-title" style="margin-top: 100px; margin-bottom: 30px; font-size: 2.2rem;">だれかと遊ぶ</h2>
+            <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 600px;">
+                <h3 data-i18n="random_match_subtitle" style="color: white; font-size: 1.5rem; margin-bottom: 20px;">ランダムマッチング</h3>
+                <p id="random-match-status" data-i18n="random_match_status" style="color: white; font-size: 1.2rem; margin-bottom: 20px;">対戦相手を探しています...</p>
+                <p data-i18n="random_match_desc" class="mode-desc" style="color: #94a3b8; font-size: 1rem; margin-bottom: 30px;">（ノーマルルール・シンプルモード）</p>
+                <div class="blinking-text" style="font-size: 3rem; color: #3b82f6;">...</div>
+            </div>
+        </div>
+
+        <!-- Start Screen (Rule & Mode Selection Integrated) -->
+        <div id="start-screen" class="screen new-start-screen">
+            <button id="rule-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+            
+            <h2 id="start-screen-title" data-i18n="battle_settings_title" class="category-title" style="margin-top: 40px; margin-bottom: 40px; font-size: 2.2rem;">バトル設定</h2>
+            
+            <!-- Host Lobby Info (hidden by default) -->
+            <div id="host-lobby-info" class="hidden" style="margin-bottom: 20px; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); padding: 10px 20px; border-radius: 8px; text-align: center; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <span style="color: #fbbf24; font-weight: bold; font-size: 1.1rem;">👤 参加者: </span>
+                <span id="host-lobby-opponent-name" style="color: white; font-size: 1.2rem; margin-left: 10px;">Opponent</span>
+            </div>
+            
+            <!-- Section 1: Rules -->
+            <div id="rule-selection-section">
+                <h3 id="rule-selection-title" data-i18n="rule_select_title" class="section-title" style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 12px; letter-spacing: 2px; text-transform: uppercase;">1. ルールを選択</h3>
+                <div id="rule-selection-container" class="mode-select-container" style="margin-bottom: 30px;">
+                    <button id="normal-rule-btn" class="mode-btn normal-mode select-toggle active" data-rule="normal">
+                        <span data-i18n="normal_rule">ノーマルルール</span><br><span data-i18n="normal_rule_desc" class="mode-desc">固定10枚のデッキで対戦</span>
+                    </button>
+                    <button id="deck-rule-btn" class="mode-btn deck-mode select-toggle" data-rule="deck">
+                        <span data-i18n="deck_rule">デッキルール</span><br><span data-i18n="deck_rule_desc" class="mode-desc">好きな10枚を組んで対戦</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2: Modes -->
+            <div id="mode-selection-section">
+                <h3 data-i18n="mode_select_title" class="section-title" style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 12px; letter-spacing: 2px; text-transform: uppercase;">2. モードを選択</h3>
+                <div class="mode-select-container" style="margin-bottom: 40px;">
+                    <button id="simple-mode-btn" class="mode-btn select-toggle active" data-mode="simple">
+                        <span data-i18n="simple_mode">シンプルモード</span><br><span data-i18n="simple_mode_desc" class="mode-desc">5ラウンドで1試合を行う基本モード</span>
+                    </button>
+                    <button id="streak-mode-btn" class="mode-btn select-toggle" data-mode="streak">
+                        <span data-i18n="streak_mode">連勝モード</span><br><span data-i18n="streak_mode_desc" class="mode-desc">負けるまで無限に続くサバイバル</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 3: Player Count -->
+            <div id="player-count-section">
+                <h3 data-i18n="player_count_title" class="section-title" style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 5px; letter-spacing: 2px; text-transform: uppercase;">3. プレイ人数</h3>
+                <p style="font-size: 0.85rem; color: #fbbf24; margin-bottom: 15px;">※スマホの人は２人プレイまでがおすすめ</p>
+                <div class="mode-select-container" style="margin-bottom: 40px; display: flex; gap: 15px;">
+                    <button id="player-count-2" class="mode-btn select-toggle active" data-players="2" style="flex: 1; min-width: 0; padding: 15px 10px;">
+                        <span data-i18n="player_2">2人プレイ</span><br><span data-i18n="player_2_desc" class="mode-desc">1対1の対戦</span>
+                    </button>
+                    <button id="player-count-3" class="mode-btn select-toggle" data-players="3" style="flex: 1; min-width: 0; padding: 15px 10px;">
+                        <span data-i18n="player_3">3人プレイ</span><br><span data-i18n="player_3_desc" class="mode-desc">三つ巴の戦い</span>
+                    </button>
+                    <button id="player-count-4" class="mode-btn select-toggle" data-players="4" style="flex: 1; min-width: 0; padding: 15px 10px;">
+                        <span data-i18n="player_4">4人プレイ</span><br><span data-i18n="player_4_desc" class="mode-desc">大乱闘</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Start Battle Button -->
+            <button id="play-start-btn" data-i18n="battle_start_btn" class="primary-btn battle-start-btn" style="font-size: 1.6rem; padding: 1rem 3.5rem;">バトル開始！</button>
+        </div>
+
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="screen new-start-screen">
+            <button id="lobby-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
+            <h2 data-i18n="online_play" class="category-title" style="margin-top: 100px; margin-bottom: 30px; font-size: 2.2rem;">友達と遊ぶ</h2>
+            <!-- Action Selection -->
+            <div id="lobby-action-selection" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <h3 data-i18n="lobby_action_title" style="color: white; font-size: 1.5rem; margin-bottom: 10px;">通信対戦</h3>
+                <button id="show-host-panel-btn" data-i18n="create_room" class="primary-btn battle-start-btn" style="width: 100%; max-width: 400px; font-size: 1.5rem; padding: 20px;">部屋を作る</button>
+                <button id="show-join-panel-btn" data-i18n="join_room" class="primary-btn battle-start-btn" style="width: 100%; max-width: 400px; font-size: 1.5rem; padding: 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);">部屋に入る</button>
+            </div>
+            
+            <div id="lobby-container" class="lobby-container hidden" style="display: flex; justify-content: center; width: 100%; max-width: 800px;">
+                <!-- Host Panel -->
+                <div id="host-panel" class="lobby-panel hidden" style="flex: 1; max-width: 400px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <h3 data-i18n="create_room" style="color: white; margin-bottom: 20px;">部屋を作る</h3>
+                    <p data-i18n="create_room_desc" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; text-align: center;">ルームIDを発行して友達を待ちます。</p>
+                    <button id="create-room-btn" class="primary-btn battle-start-btn" style="width: 100%;">CREATE ROOM</button>
+                    
+                    <div id="host-waiting-area" class="hidden" style="margin-top: 30px; width: 100%; text-align: center;">
+                        <p style="color: #94a3b8; margin-bottom: 10px;">あなたのRoom ID:</p>
+                        <div id="host-room-id" style="font-size: 2.5rem; color: #a855f7; font-weight: 800; font-family: 'Outfit', sans-serif; letter-spacing: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">------</div>
+                        <p data-i18n="waiting_participants" style="color: #fbbf24; font-size: 0.9rem; margin-top: 15px;" class="blinking-text">参加者を待っています...</p>
+                    </div>
+                </div>
+
+                <!-- Join Panel -->
+                <div id="join-panel" class="lobby-panel hidden" style="flex: 1; max-width: 400px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <h3 data-i18n="join_room" style="color: white; margin-bottom: 20px;">部屋に入る</h3>
+                    <p data-i18n="join_room_desc" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; text-align: center;">友達のRoom IDを入力して参加します。</p>
+                    <input type="text" id="join-room-input" data-i18n="join_placeholder" placeholder="Room ID (6桁)" maxlength="6" style="width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; border-radius: 8px; border: 2px solid rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); color: white; outline: none; margin-bottom: 20px; letter-spacing: 5px; font-family: 'Outfit', sans-serif;">
+                    <button id="join-room-btn" class="primary-btn battle-start-btn" style="width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);">JOIN ROOM</button>
+                    <p id="join-error-msg" class="hidden" style="color: #ef4444; font-size: 0.9rem; margin-top: 15px;"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guest Wait Screen -->
+        <div id="guest-wait-screen" class="screen new-start-screen">
+            <h2 data-i18n="online_play" class="category-title" style="margin-top: 100px; margin-bottom: 30px; font-size: 2.2rem;">オンラインロビー</h2>
+            
+            <div id="guest-lobby-info" style="margin-bottom: 20px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); padding: 10px 20px; border-radius: 8px; text-align: center; max-width: 600px; margin-left: auto; margin-right: auto; width: 100%;">
+                <span style="color: #60a5fa; font-weight: bold; font-size: 1.1rem;">👑 ホスト: </span>
+                <span id="guest-lobby-host-name" style="color: white; font-size: 1.2rem; margin-left: 10px;">HostName</span>
+            </div>
+
+            <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 600px; width: 100%;">
+                <p id="guest-wait-message" data-i18n="setting_rules" style="color: white; font-size: 1.5rem; margin-bottom: 20px;">ルールを設定中です</p>
+                <p data-i18n="wait_a_moment" style="color: #94a3b8; font-size: 1rem; margin-bottom: 30px;">しばらくお待ちください...</p>
+                <div class="blinking-text" style="font-size: 3rem; color: #fbbf24;">...</div>
+            </div>
+        </div>
+
+        <!-- Deck Builder Screen -->
+        <div id="deck-builder-screen" class="screen deck-builder-layout">
+            <div class="deck-header">
+                <h1 data-i18n="deck_rule" class="deck-title">デッキ構築</h1>
+                <div class="deck-count-badge"><span data-i18n="deck_total">合計</span>: <span id="deck-total-count">0</span>/10 枚</div>
+                <p data-i18n="deck_desc" class="deck-desc">1〜10のカードから、同じカードは最大3枚まで選べます。</p>
+            </div>
+            <div id="deck-builder-grid" class="deck-grid">
+                <!-- Cards injected by JS -->
+            </div>
+            <div class="deck-footer">
+                <button id="deck-back-btn" data-i18n="cancel_btn" class="deck-action-btn back-btn">キャンセル</button>
+                <button id="deck-save-btn" data-i18n="save_btn" class="deck-action-btn start-btn" disabled>保存する</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <button id="game-title-btn" data-i18n="return_title_btn" class="title-return-btn">タイトルに戻る</button>
+            <button id="game-help-btn" style="position: absolute; top: 80px; left: 30px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.5); font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; transition: all 0.2s;">？</button>
+            <div id="win-streak-indicator" class="win-streak-indicator hidden"><span id="win-streak-count">0</span>連勝中</div>
+            <!-- Information Panel (Right Side) -->
+            <div id="hover-info-panel" class="hover-info-panel hidden">
+                <div id="hover-card-preview" class="hover-preview-card"></div>
+                <div id="hover-text-preview" class="hidden" style="background: rgba(15, 23, 42, 0.95); border: 2px solid #ec4899; border-radius: 12px; padding: 20px; width: 250px; color: white; text-align: left; box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Opponents Area -->
+            <div id="opponents-container" style="display: flex; justify-content: center; gap: 10px; width: 100%; min-height: 250px;">
+                <!-- CPU1 Area -->
+                <div id="cpu1-area" class="player-area cpu-area">
+                    <div class="score-container">
+                        <span id="cpu1-name-display" class="player-label">CPU 1</span>
+                        <span id="cpu1-score" class="score">0</span>
+                    </div>
+                    <div class="cards-layout">
+                        <div class="deck-container">
+                            <div class="deck-label" style="display:flex; align-items:center; gap:5px; justify-content:center;"><span data-i18n="deck_view">山札</span> <button id="view-cpu1-deck-btn" data-i18n="deck_view_btn" class="deck-view-btn hidden">デッキを見る</button></div>
+                            <div id="cpu1-deck-ui" class="deck-card">
+                                <div class="deck-hover-info"><span id="cpu1-deck-count">5</span></div>
+                            </div>
+                        </div>
+                        <div class="hand-area" style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                            <div id="cpu1-modifier-badge" class="modifier-badge hidden"></div>
+                            <div id="cpu1-hand" class="hand-container">
+                                <!-- CPU cards generated via JS -->
+                            </div>
+                        </div>
+                        <div class="history-container">
+                            <div data-i18n="grave" class="history-label">お墓</div>
+                            <div id="cpu1-history" class="history-cards">
+                                <!-- CPU history cards -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CPU2 Area -->
+                <div id="cpu2-area" class="player-area cpu-area hidden">
+                    <div class="score-container">
+                        <span id="cpu2-name-display" class="player-label">CPU 2</span>
+                        <span id="cpu2-score" class="score">0</span>
+                    </div>
+                    <div class="cards-layout">
+                        <div class="deck-container">
+                            <div class="deck-label" style="display:flex; align-items:center; gap:5px; justify-content:center;"><span data-i18n="deck_view">山札</span> <button id="view-cpu2-deck-btn" data-i18n="deck_view_btn" class="deck-view-btn hidden">デッキを見る</button></div>
+                            <div id="cpu2-deck-ui" class="deck-card">
+                                <div class="deck-hover-info"><span id="cpu2-deck-count">5</span></div>
+                            </div>
+                        </div>
+                        <div class="hand-area" style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                            <div id="cpu2-modifier-badge" class="modifier-badge hidden"></div>
+                            <div id="cpu2-hand" class="hand-container">
+                                <!-- CPU cards generated via JS -->
+                            </div>
+                        </div>
+                        <div class="history-container">
+                            <div data-i18n="grave" class="history-label">お墓</div>
+                            <div id="cpu2-history" class="history-cards">
+                                <!-- CPU history cards -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CPU3 Area -->
+                <div id="cpu3-area" class="player-area cpu-area hidden">
+                    <div class="score-container">
+                        <span id="cpu3-name-display" class="player-label">CPU 3</span>
+                        <span id="cpu3-score" class="score">0</span>
+                    </div>
+                    <div class="cards-layout">
+                        <div class="deck-container">
+                            <div class="deck-label" style="display:flex; align-items:center; gap:5px; justify-content:center;"><span data-i18n="deck_view">山札</span> <button id="view-cpu3-deck-btn" data-i18n="deck_view_btn" class="deck-view-btn hidden">デッキを見る</button></div>
+                            <div id="cpu3-deck-ui" class="deck-card">
+                                <div class="deck-hover-info"><span id="cpu3-deck-count">5</span></div>
+                            </div>
+                        </div>
+                        <div class="hand-area" style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                            <div id="cpu3-modifier-badge" class="modifier-badge hidden"></div>
+                            <div id="cpu3-hand" class="hand-container">
+                                <!-- CPU cards generated via JS -->
+                            </div>
+                        </div>
+                        <div class="history-container">
+                            <div data-i18n="grave" class="history-label">お墓</div>
+                            <div id="cpu3-history" class="history-cards">
+                                <!-- CPU history cards -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battlefield -->
+            <div class="battlefield">
+                <div class="round-indicator">
+                    ROUND <span id="round-number">1</span>/5
+                </div>
+                <div class="battle-cards">
+                    <div id="opponents-played-cards" style="display: flex; gap: 10px;">
+                        <div id="cpu1-played-card" class="played-card-slot">
+                            <div class="placeholder">?</div>
+                        </div>
+                        <div id="cpu2-played-card" class="played-card-slot hidden">
+                            <div class="placeholder">?</div>
+                        </div>
+                        <div id="cpu3-played-card" class="played-card-slot hidden">
+                            <div class="placeholder">?</div>
+                        </div>
+                    </div>
+                    <div class="vs-badge">VS</div>
+                    <div id="player-played-card" class="played-card-slot">
+                        <div class="placeholder">?</div>
+                    </div>
+                </div>
+                <button id="ready-btn" class="primary-btn hidden-btn">EAT？</button>
+                <div id="eat-shout" class="eat-shout-message hidden-anim">１０</div>
+                <div id="round-result" class="round-result-message hidden-anim">
+                    WIN!
+                </div>
+                <div id="target-selection-msg" class="hidden" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 50px; color: #a855f7; font-weight: bold; border: 2px solid rgba(168, 85, 247, 0.5); z-index: 100; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); text-align: center;">
+                    <div style="font-size: 1.2rem; margin-bottom: 5px;" id="target-selection-title">対象を選択してください</div>
+                    <div style="font-size: 0.9rem; color: #e2e8f0; font-weight: normal;" id="target-selection-desc"></div>
+                </div>
+                <div id="waiting-network-msg" class="hidden" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 50px; color: #fbbf24; font-weight: bold; border: 2px solid rgba(251, 191, 36, 0.5); z-index: 100; box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);" class="blinking-text">相手の選択を待っています</div>
+            </div>
+
+            <!-- Player Area -->
+            <div class="player-area my-area">
+                <div class="score-container">
+                    <span id="player-name-display" class="player-label">YOU</span>
+                    <span id="player-score" class="score">0</span>
+                </div>
+                <div class="cards-layout">
+                    <div class="deck-container">
+                        <div class="deck-label" style="display:flex; align-items:center; gap:5px; justify-content:center;">山札 <button id="view-deck-btn" class="deck-view-btn hidden">デッキを見る</button></div>
+                        <div id="player-deck-ui" class="deck-card">
+                            <div class="deck-hover-info"><span id="player-deck-count">5</span></div>
+                        </div>
+                    </div>
+                    <div class="hand-area" style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                        <div id="player-modifier-badge" class="modifier-badge hidden"></div>
+                        <div id="player-hand" class="hand-container">
+                            <!-- Player cards generated via JS -->
+                        </div>
+                    </div>
+                    <div class="history-container">
+                        <div data-i18n="grave" class="history-label">お墓</div>
+                        <div id="player-history" class="history-cards">
+                            <!-- Player history cards -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h2 id="final-result-title" class="result-title">VICTORY</h2>
+            <div class="final-scores">
+                <div class="final-score-box">
+                    <div id="final-player-rank" style="font-weight: bold; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: none; margin-bottom: 5px;">1位</div>
+                    <span class="label">YOU</span>
+                    <span id="final-player-score" class="score-value">5</span>
+                </div>
+                <div class="final-score-box">
+                    <div id="final-cpu1-rank" style="font-weight: bold; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: none; margin-bottom: 5px;">1位</div>
+                    <span id="final-cpu1-name" class="label">CPU 1</span>
+                    <span id="final-cpu1-score" class="score-value">0</span>
+                </div>
+                <div id="final-score-cpu2" class="final-score-box hidden">
+                    <div id="final-cpu2-rank" style="font-weight: bold; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: none; margin-bottom: 5px;">1位</div>
+                    <span id="final-cpu2-name" class="label">CPU 2</span>
+                    <span id="final-cpu2-score" class="score-value">0</span>
+                </div>
+                <div id="final-score-cpu3" class="final-score-box hidden">
+                    <div id="final-cpu3-rank" style="font-weight: bold; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: none; margin-bottom: 5px;">1位</div>
+                    <span id="final-cpu3-name" class="label">CPU 3</span>
+                    <span id="final-cpu3-score" class="score-value">0</span>
+                </div>
+            </div>
+            
+            <!-- Rating Result Container Removed -->
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+                <button id="next-match-btn" class="primary-btn hidden">次のゲームへ</button>
+                <button id="restart-btn" class="primary-btn">もう一戦</button>
+                <button id="end-title-btn" class="secondary-btn">タイトルに戻る</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target Selection Modal -->
+    <div id="target-selection-modal" class="modal-overlay hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+        <div class="modal-content" style="background: rgba(15, 23, 42, 0.95); border: 2px solid #a855f7; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 500px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);">
+            <h2 id="target-selection-title" style="color: white; margin-top: 0; margin-bottom: 20px;">ターゲットを選択してください</h2>
+            <div id="target-selection-container" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <!-- Target buttons injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Detail Modal -->
+    <div id="card-detail-modal" class="modal-overlay hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+        <div style="background: rgba(30, 41, 59, 0.95); border: 2px solid rgba(168, 85, 247, 0.5); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); position: relative; display: flex; flex-direction: column; gap: 20px;">
+            <button id="close-card-detail-btn" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 2rem; cursor: pointer;">&times;</button>
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                <div id="detail-card-preview" class="hover-preview-card deck-preview" style="transform: scale(0.9); transform-origin: top left; margin: 0; cursor: default;"></div>
+                <div style="flex: 1;">
+                    <h3 id="detail-card-name" style="color: #a855f7; font-size: 1.8rem; margin: 0 0 10px 0; letter-spacing: 1px;">ハナ</h3>
+                    <div style="font-size: 1.1rem; color: #e2e8f0; margin-bottom: 5px;">強さ：<span id="detail-card-power" style="font-weight: bold; color: white;">1</span></div>
+                    <div style="font-size: 1.1rem; color: #38bdf8; font-weight: bold; margin-bottom: 8px;">わざ：<span id="detail-card-skill">平和の象徴</span></div>
+                    <p id="detail-card-ability" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; margin: 0; word-break: break-all;">場に出されたカードの中に「ヒト」があったら強さ関係なく自分はこのターン勝利する。</p>
+                </div>
+            </div>
+            
+            <div id="detail-card-extra-info" style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px;">
+                <p id="detail-card-flavor" style="color: #fbbf24; font-size: 0.95rem; line-height: 1.5; margin: 0;">◉一番強い「ヒト」に逆転勝ちすることができるカード。これを持っているだけで相手は「ヒト」を出しづらくなる。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2500; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+        <div class="modal-content" style="background: rgba(30, 41, 59, 0.95); border: 2px solid #3b82f6; padding: 30px; border-radius: 16px; text-align: left; width: 90%; max-width: 400px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); position: relative;">
+            <button id="close-settings-btn" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 2rem; cursor: pointer;">&times;</button>
+            <h2 data-i18n="settings_title" style="color: white; margin-top: 0; margin-bottom: 25px; text-align: center;">設定</h2>
+            
+            
+            <div style="margin-bottom: 20px;">
+                <label data-i18n="language" style="color: #cbd5e1; display: block; margin-bottom: 10px; font-size: 1.1rem; font-weight: bold;">言語 / Language</label>
+                <select id="language-select" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); color: white; border: 1px solid #3b82f6; border-radius: 8px; font-size: 1.1rem; outline: none;">
+                    <option value="ja">日本語</option>
+                    <option value="en">English</option>
+                    <option value="zh">中文 (简体)</option>
+                    <option value="ko">한국어</option>
+                </select>
+            </div>
+
+            <div style="text-align: center;">
+                <button id="reset-data-btn" data-i18n="reset_data" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.4)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'">セーブデータをリセット</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

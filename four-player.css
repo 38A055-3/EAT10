@@ -1,0 +1,141 @@
+/* 4 Player Layout Grid */
+body.four-player-layout #game-screen {
+    display: block; /* We'll use absolute positioning for everything for maximum control */
+}
+
+body.four-player-layout #opponents-container {
+    display: contents;
+}
+
+body.four-player-layout .player-area {
+    position: absolute;
+    width: auto;
+}
+
+/* Stations */
+body.four-player-layout #cpu1-area {
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+}
+
+body.four-player-layout #cpu2-area {
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+}
+body.four-player-layout #cpu2-area .cards-layout {
+    flex-direction: row-reverse;
+}
+
+body.four-player-layout #cpu3-area {
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+body.four-player-layout .player-area.my-area {
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+body.four-player-layout .player-area.my-area .cards-layout {
+    flex-direction: row-reverse;
+}
+
+/* Separate Player Hand */
+body.four-player-layout .player-area.my-area .hand-area {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+}
+
+/* Center Area (Battlefield) */
+body.four-player-layout .battlefield {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; /* Let clicks pass through to stations */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+body.four-player-layout .battlefield > * {
+    pointer-events: auto; /* Re-enable clicks for battlefield elements */
+}
+
+/* Reposition Played Cards */
+body.four-player-layout .battle-cards {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: block;
+}
+
+body.four-player-layout #opponents-played-cards {
+    display: contents !important; /* Unwrap flex */
+}
+
+body.four-player-layout .played-card-slot {
+    position: absolute;
+}
+
+body.four-player-layout #cpu1-played-card {
+    top: 30%; left: 25%;
+}
+
+body.four-player-layout #cpu2-played-card {
+    top: 30%; right: 25%;
+}
+
+body.four-player-layout #cpu3-played-card {
+    bottom: 35%; left: 25%;
+}
+
+body.four-player-layout #player-played-card {
+    bottom: 35%; right: 25%;
+}
+
+/* VS and Round Badge */
+body.four-player-layout .vs-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+body.four-player-layout .round-indicator {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* EAT? Button */
+body.four-player-layout #ready-btn {
+    position: absolute;
+    bottom: 28%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    font-size: 1.5rem;
+}
+
+/* Hover Info Panel */
+body.four-player-layout #hover-info-panel {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+}
