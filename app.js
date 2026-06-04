@@ -296,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.nameUpdateTimeout = setTimeout(() => {
                 if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
                 if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+                if (window.syncToCloud) window.syncToCloud();
             }, 1000);
         });
     }
@@ -363,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
                 if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+                if (window.syncToCloud) window.syncToCloud();
             });
             iconSelectionContainer.appendChild(btn);
         });
@@ -395,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
                 if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+                if (window.syncToCloud) window.syncToCloud();
             });
             colorSelectionContainer.appendChild(btn);
         });
@@ -411,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('eat10_custom_decks', JSON.stringify(customDecks));
         localStorage.setItem('eat10_active_deck_index', activeDeckIndex.toString());
         localStorage.setItem('eat10_custom_deck_names', JSON.stringify(customDeckNames));
+        if (window.syncToCloud) window.syncToCloud();
     }
 
     let selectedRule = 'normal';
@@ -429,7 +433,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveStats() {
         localStorage.setItem('eat10_stats', JSON.stringify(stats));
+        if (window.syncToCloud) window.syncToCloud();
     }
+
+    window.syncToCloud = function() {
+        if (!playerUid || typeof firebase === 'undefined' || !firebase.database) return;
+        const db = firebase.database();
+        const userData = {
+            profile: {
+                name: playerName,
+                icon: playerIcon,
+                color: playerColor
+            },
+            stats: stats,
+            custom_decks: customDecks,
+            active_deck_index: activeDeckIndex,
+            custom_deck_names: customDeckNames,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        db.ref('users/' + playerUid).set(userData).catch(e => console.error("Cloud sync failed:", e));
+    };
+
+    // Initial sync
+    window.syncToCloud();
 
     // --- Initialization ---
     document.getElementById('title-battle-btn').addEventListener('click', () => {
@@ -3594,6 +3620,68 @@ document.addEventListener('DOMContentLoaded', () => {
         closeSettingsBtn.addEventListener('click', closeSettings);
 
         fetchGlobalRanking();
+
+        const displayPlayerId = document.getElementById('display-player-id');
+        if (displayPlayerId) {
+            displayPlayerId.value = playerUid || '';
+        }
+
+        const copyIdBtn = document.getElementById('copy-id-btn');
+        if (copyIdBtn && displayPlayerId) {
+            copyIdBtn.addEventListener('click', () => {
+                displayPlayerId.select();
+                document.execCommand('copy');
+                const originalText = copyIdBtn.textContent;
+                copyIdBtn.textContent = window.t('id_copied') !== 'id_copied' ? window.t('id_copied') : 'コピーしました';
+                setTimeout(() => {
+                    copyIdBtn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        const transferDataBtn = document.getElementById('transfer-data-btn');
+        const inputTransferId = document.getElementById('input-transfer-id');
+        if (transferDataBtn && inputTransferId) {
+            transferDataBtn.addEventListener('click', async () => {
+                const targetId = inputTransferId.value.trim();
+                if (!targetId) return;
+                
+                if (targetId === playerUid) {
+                    alert('すでにこのIDのアカウントを使用しています。');
+                    return;
+                }
+
+                if (confirm(window.t('transfer_confirm') !== 'transfer_confirm' ? window.t('transfer_confirm') : "現在のデータは入力されたIDのデータに上書きされます。本当によろしいですか？")) {
+                    try {
+                        const db = firebase.database();
+                        const snapshot = await db.ref('users/' + targetId).once('value');
+                        const data = snapshot.val();
+                        
+                        if (data) {
+                            // Apply data
+                            if (data.profile) {
+                                if (data.profile.name) localStorage.setItem('eat10_player_name', data.profile.name);
+                                if (data.profile.icon) localStorage.setItem('eat10_player_icon', data.profile.icon);
+                                if (data.profile.color) localStorage.setItem('eat10_player_color', data.profile.color);
+                            }
+                            if (data.stats) localStorage.setItem('eat10_stats', JSON.stringify(data.stats));
+                            if (data.custom_decks) localStorage.setItem('eat10_custom_decks', JSON.stringify(data.custom_decks));
+                            if (typeof data.active_deck_index !== 'undefined') localStorage.setItem('eat10_active_deck_index', data.active_deck_index.toString());
+                            if (data.custom_deck_names) localStorage.setItem('eat10_custom_deck_names', JSON.stringify(data.custom_deck_names));
+                            
+                            localStorage.setItem('eat10_player_uid', targetId);
+                            alert(window.t('transfer_success') !== 'transfer_success' ? window.t('transfer_success') : "データを引き継ぎました！");
+                            location.reload();
+                        } else {
+                            alert(window.t('transfer_failed') !== 'transfer_failed' ? window.t('transfer_failed') : "該当するIDのデータが見つかりませんでした。");
+                        }
+                    } catch (e) {
+                        console.error('Transfer failed:', e);
+                        alert("通信エラーが発生しました。");
+                    }
+                }
+            });
+        }
     }
 
 });
