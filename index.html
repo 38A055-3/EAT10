@@ -284,8 +284,8 @@
 
             <!-- Section 3: Player Count -->
             <div id="player-count-section">
-                <h3 data-i18n="player_count_title" class="section-title" style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 5px; letter-spacing: 2px; text-transform: uppercase;">3. プレイ人数</h3>
-                <p style="font-size: 0.85rem; color: #fbbf24; margin-bottom: 15px;">※スマホの人は２人プレイまでがおすすめ</p>
+                <h3 id="player-count-title" data-i18n="player_count_title" class="section-title" style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 5px; letter-spacing: 2px; text-transform: uppercase;">3. プレイ人数</h3>
+                <p id="player-count-recommendation" style="font-size: 0.85rem; color: #fbbf24; margin-bottom: 15px;">※３.４人プレイは横画面がおすすめ</p>
                 <div class="mode-select-container" style="margin-bottom: 40px; display: flex; gap: 15px;">
                     <button id="player-count-2" class="mode-btn select-toggle active" data-players="2" style="flex: 1; min-width: 0; padding: 15px 10px;">
                         <span data-i18n="player_2">2人プレイ</span><br><span data-i18n="player_2_desc" class="mode-desc">1対1の対戦</span>
@@ -309,7 +309,7 @@
             <h2 data-i18n="online_play" class="category-title" style="margin-top: 100px; margin-bottom: 30px; font-size: 2.2rem;">友達と遊ぶ</h2>
             <!-- Action Selection -->
             <div id="lobby-action-selection" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; align-items: center;">
-                <h3 data-i18n="lobby_action_title" style="color: white; font-size: 1.5rem; margin-bottom: 10px;">通信対戦</h3>
+
                 <button id="show-host-panel-btn" data-i18n="create_room" class="primary-btn battle-start-btn" style="width: 100%; max-width: 400px; font-size: 1.5rem; padding: 20px;">部屋を作る</button>
                 <button id="show-join-panel-btn" data-i18n="join_room" class="primary-btn battle-start-btn" style="width: 100%; max-width: 400px; font-size: 1.5rem; padding: 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);">部屋に入る</button>
             </div>
@@ -508,7 +508,7 @@
             <!-- Player Area -->
             <div class="player-area my-area">
                 <div class="score-container">
-                    <span id="player-name-display" class="player-label"><span id="player-icon-display">👤</span> YOU</span>
+                    <span id="player-name-display" class="player-label">YOU</span>
                     <span id="player-score" class="score">0</span>
                 </div>
                 <div class="cards-layout">
@@ -540,7 +540,7 @@
             <div class="final-scores">
                 <div class="final-score-box">
                     <div id="final-player-rank" style="font-weight: bold; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: none; margin-bottom: 5px;">1位</div>
-                    <span class="label">YOU</span>
+                    <span id="final-player-name" class="label">YOU</span>
                     <span id="final-player-score" class="score-value">5</span>
                 </div>
                 <div class="final-score-box">
@@ -617,7 +617,7 @@
             </div>
 
             <div style="text-align: center;">
-                <button id="reset-data-btn" data-i18n="reset_data" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.4)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'">セーブデータをリセット</button>
+
             </div>
         </div>
     </div>

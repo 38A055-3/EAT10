@@ -1954,18 +1954,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const ruleTitle = document.getElementById('rule-selection-title');
             const ruleContainer = document.getElementById('rule-selection-container');
             const startTitle = document.getElementById('start-screen-title');
+            const recText = document.getElementById('player-count-recommendation');
+            const playerCountTitle = document.getElementById('player-count-title');
             
             if (isOnlineMode) {
                 if (startTitle) startTitle.textContent = window.t('lobby_title');
                 if (modeSelection) modeSelection.classList.add('hidden');
                 if (ruleTitle) ruleTitle.classList.add('hidden');
                 if (ruleContainer) ruleContainer.style.flexDirection = 'column';
+                if (recText) recText.style.display = 'none';
+                if (playerCountTitle) {
+                    playerCountTitle.removeAttribute('data-i18n-prefix');
+                    playerCountTitle.textContent = window.t('player_count_title');
+                }
                 selectedMode = 'simple'; // Online mode forces simple mode
             } else {
                 if (startTitle) startTitle.textContent = window.t('battle_settings_title');
                 if (modeSelection) modeSelection.classList.remove('hidden');
                 if (ruleTitle) ruleTitle.classList.remove('hidden');
                 if (ruleContainer) ruleContainer.style.flexDirection = 'row';
+                if (recText) recText.style.display = 'block';
+                if (playerCountTitle) {
+                    playerCountTitle.setAttribute('data-i18n-prefix', '3. ');
+                    playerCountTitle.textContent = '3. ' + window.t('player_count_title');
+                }
             }
         } else if (screenName === 'title') {
             fetchGlobalRanking();
@@ -2003,19 +2015,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const cpuNameDisplays = document.querySelectorAll('.player-label');
         cpuNameDisplays.forEach(el => {
             if (el.id === 'player-name-display') {
-                const iconHtml = playerIcon.endsWith('.png') ? `<img src="${playerIcon}" style="width: 32px; height: 32px; vertical-align: middle; border-radius: 50%; object-fit: contain; transform: scale(1.15);">` : playerIcon;
-                el.innerHTML = `<span id="player-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">${iconHtml}</span> YOU`;
+                el.innerHTML = playerName;
             } else if (el.id === 'cpu1-name-display') {
                 if (selectedPlayerCount > 2) {
-                    el.innerHTML = `<span id="cpu1-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">🤖</span> CPU 1`;
+                    el.innerHTML = `CPU 1`;
                 } else {
-                    const oppIconHtml = (opponentIcon && opponentIcon.endsWith('.png')) ? `<img src="${opponentIcon}" style="width: 32px; height: 32px; vertical-align: middle; border-radius: 50%; object-fit: contain; transform: scale(1.15);">` : (opponentIcon || '🤖');
-                    el.innerHTML = `<span id="cpu1-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">${isOnlineMode ? oppIconHtml : '🤖'}</span> ${isOnlineMode ? opponentName : 'CPU'}`;
+                    el.innerHTML = isOnlineMode ? opponentName : 'CPU';
                 }
             } else if (el.id === 'cpu2-name-display') {
-                el.innerHTML = `<span id="cpu2-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">🤖</span> CPU 2`;
+                el.innerHTML = `CPU 2`;
             } else if (el.id === 'cpu3-name-display') {
-                el.innerHTML = `<span id="cpu3-icon-display" style="display:inline-flex; align-items:center; justify-content:center; margin-right: 5px;">🤖</span> CPU 3`;
+                el.innerHTML = `CPU 3`;
             }
         });
 
@@ -3253,6 +3263,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.finalPlayerScore.textContent = playerScore;
         ui.finalCpuScore.textContent = cpuScore;
         
+        const finalPlayerName = document.getElementById('final-player-name');
+        if (finalPlayerName) finalPlayerName.textContent = playerName;
+
+        const finalCpu1Name = document.getElementById('final-cpu1-name');
+        if (finalCpu1Name) {
+            if (isOnlineMode) {
+                finalCpu1Name.textContent = opponentName;
+            } else {
+                finalCpu1Name.textContent = 'CPU 1';
+            }
+        }
+        
         const finalCpu2ScoreBox = document.getElementById('final-score-cpu2');
         const finalCpu3ScoreBox = document.getElementById('final-score-cpu3');
         if (finalCpu2ScoreBox && ui.finalCpu2Score) {
@@ -3551,7 +3573,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-    if (settingsBtn && settingsModal && closeSettingsBtn && resetDataBtn) {
+    if (settingsBtn && settingsModal && closeSettingsBtn) {
         settingsBtn.addEventListener('click', () => {
             settingsModal.classList.remove('hidden');
             // Allow display block to apply before changing opacity for transition
@@ -3572,16 +3594,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeSettingsBtn.addEventListener('click', closeSettings);
 
         fetchGlobalRanking();
-
-        resetDataBtn.addEventListener('click', () => {
-            if (confirm(window.t('reset_confirm'))) {
-                localStorage.removeItem('eat10_stats');
-                localStorage.removeItem('eat10_profile');
-                localStorage.removeItem('eat10_decks');
-                alert(window.t('reset_done'));
-                location.reload();
-            }
-        });
     }
 
 });
