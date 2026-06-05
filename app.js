@@ -221,15 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedDecks = localStorage.getItem('eat10_custom_decks');
     if (savedDecks) {
         try { customDecks = JSON.parse(savedDecks); } 
-        catch(e) { customDecks = Array(10).fill(null); }
+        catch(e) { customDecks = Array(4).fill(null); }
         
+        if (customDecks.length > 4) customDecks = customDecks.slice(0, 4);
+        if (customDecks.length < 4) {
+            while(customDecks.length < 4) customDecks.push(null);
+        }
+
         if (customDecks.every(deck => deck === null)) {
             customDecks[0] = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1 };
         }
     } else {
         // 移行措置
         const oldDeck = localStorage.getItem('eat10_custom_deck');
-        customDecks = Array(10).fill(null);
+        customDecks = Array(4).fill(null);
         if (oldDeck) { 
             try { customDecks[0] = JSON.parse(oldDeck); } catch(e){} 
         } else {
@@ -241,9 +246,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedNames = localStorage.getItem('eat10_custom_deck_names');
     if (savedNames) {
         try { customDeckNames = JSON.parse(savedNames); } 
-        catch(e) { customDeckNames = Array(10).fill(''); }
+        catch(e) { customDeckNames = Array(4).fill(''); }
     }
-    for (let i = 0; i < 10; i++) {
+    if (customDeckNames.length > 4) customDeckNames = customDeckNames.slice(0, 4);
+    if (customDeckNames.length < 4) {
+        while(customDeckNames.length < 4) customDeckNames.push('');
+    }
+    for (let i = 0; i < 4; i++) {
         let name = customDeckNames[i];
         if (!name || name.match(/^(デッキ|Deck|卡组|덱) \d+$/)) {
             customDeckNames[i] = (window.t('deck_btn') + ' ' + (i + 1));
@@ -1362,7 +1371,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bottomBackContainer) bottomBackContainer.classList.remove('hidden');
         }
         
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 4; i++) {
             const wrapper = document.createElement('div');
             wrapper.style.display = 'flex';
             wrapper.style.flexDirection = 'column';
@@ -1508,26 +1517,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.deckListGrid.appendChild(wrapper);
         }
         
-        if (window.currentLang === 'en' && !isBattleDeckSelection) {
-            if (bottomBackContainer) {
-                ui.deckListGrid.appendChild(bottomBackContainer);
-                bottomBackContainer.style.gridColumn = '3';
-                bottomBackContainer.style.gridRow = '4';
-                bottomBackContainer.style.marginTop = '0';
-                bottomBackContainer.style.paddingBottom = '0';
-                bottomBackContainer.style.alignItems = 'flex-start';
-                bottomBackContainer.style.height = '100%';
-            }
-        } else {
-            if (bottomBackContainer) {
-                ui.deckListGrid.parentElement.appendChild(bottomBackContainer);
-                bottomBackContainer.style.gridColumn = 'auto';
-                bottomBackContainer.style.gridRow = 'auto';
-                bottomBackContainer.style.marginTop = '40px';
-                bottomBackContainer.style.paddingBottom = '60px';
-                bottomBackContainer.style.alignItems = 'center';
-                bottomBackContainer.style.height = 'auto';
-            }
+        if (bottomBackContainer) {
+            ui.deckListGrid.parentElement.appendChild(bottomBackContainer);
+            bottomBackContainer.style.gridColumn = 'auto';
+            bottomBackContainer.style.gridRow = 'auto';
+            bottomBackContainer.style.marginTop = '40px';
+            bottomBackContainer.style.paddingBottom = '60px';
+            bottomBackContainer.style.alignItems = 'center';
+            bottomBackContainer.style.height = 'auto';
         }
     }
 
