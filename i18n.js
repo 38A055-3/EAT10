@@ -58,7 +58,7 @@ const translations = {
         deck_btn: "デッキ",
         record_btn: "記録",
         rules_btn: "EAT10とは？",
-        error_reload_msg: "※エラーが起きた場合はリロードしてください",
+        error_reload_msg: "※エラーが起きる場合はリロードしてください",
         return_btn: "戻る",
         deck_list_title: "デッキ一覧",
         battle_start_btn: "バトル開始！",
