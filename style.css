@@ -2304,12 +2304,7 @@ body.four-player-layout #cpu2-area .history-cards {
     flex-direction: row-reverse !important;
 }
 
-/* Desktop English Grid Override */
-html:lang(en) #deck-list-grid, html.translated-ltr #deck-list-grid,
-html:lang(en) .deck-grid, html.translated-ltr .deck-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-    max-width: 1100px !important;
-}
+
 
 @media (max-device-width: 768px), (max-width: 768px) {
     #color-selection-container {
