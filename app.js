@@ -1927,9 +1927,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         tr.innerHTML = `
                             <td style="padding: 10px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
                             <td style="padding: 10px; font-weight: bold; color: white;">
-                                <span style="display:inline-flex; align-items:center; margin-right:8px; vertical-align: middle;">
-                                    ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(255, 255, 255, 0.8)'}; border-radius: 50%; display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.1rem;">${entry.icon || 'ha.png'}</span>`}
-                                </span> <span style="font-size: 1rem;">${entry.name}</span>
+                                <div style="display: flex; justify-content: center; align-items: center;">
+                                    <div style="display: flex; align-items: center; width: 150px; text-align: left;">
+                                        <span style="display:inline-flex; align-items:center; margin-right:12px; vertical-align: middle; flex-shrink: 0;">
+                                            ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(255, 255, 255, 0.8)'}; border-radius: 50%; display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.1rem;">${entry.icon || 'ha.png'}</span>`}
+                                        </span> 
+                                        <span style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${entry.name}</span>
+                                    </div>
+                                </div>
                             </td>
                             <td style="padding: 10px; text-align: right; font-size: 1.15rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: ${currentLeaderboardMode === 'streak' ? '#4ade80' : '#3b82f6'};">${entry[orderBy]}</td>
                         `;
