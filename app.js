@@ -1344,17 +1344,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         ui.deckListGrid.innerHTML = '';
         
-        // Change layout for English, but keep 1fr on mobile
-        if (window.matchMedia("(max-width: 800px)").matches) {
-            ui.deckListGrid.style.gridTemplateColumns = '1fr';
-            ui.deckListGrid.style.maxWidth = '100%';
-        } else if (window.currentLang === 'en') {
-            ui.deckListGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            ui.deckListGrid.style.maxWidth = '1100px';
-        } else {
-            ui.deckListGrid.style.gridTemplateColumns = 'repeat(5, 1fr)';
-            ui.deckListGrid.style.maxWidth = '1300px';
-        }
+        // Grid layout is now fully handled by CSS !important rules
 
         const titleEl = document.querySelector('#deck-list-screen .category-title');
         if (titleEl) {
@@ -1377,11 +1367,6 @@ document.addEventListener('DOMContentLoaded', () => {
             wrapper.style.display = 'flex';
             wrapper.style.flexDirection = 'column';
             wrapper.style.gap = '5px';
-            if (window.currentLang === 'en') {
-                wrapper.style.transform = 'scale(0.85)';
-                wrapper.style.transformOrigin = 'top center';
-                wrapper.style.marginBottom = '-20px';
-            }
 
             const isActive = (i === activeDeckIndex);
             const deckData = customDecks[i];
@@ -1919,13 +1904,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (entry.isEmpty) {
                         tr.innerHTML = `
-                            <td style="padding: 10px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
+                            <td style="padding: 10px; text-align: center; font-weight: bold; white-space: nowrap; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
                             <td style="padding: 10px; font-weight: bold; color: #64748b; text-align: center;">-</td>
                             <td style="padding: 10px; text-align: right; font-size: 1.15rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: #64748b;">-</td>
                         `;
                     } else {
                         tr.innerHTML = `
-                            <td style="padding: 10px; text-align: center; font-weight: bold; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
+                            <td style="padding: 10px; text-align: center; font-weight: bold; white-space: nowrap; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
                             <td style="padding: 10px; font-weight: bold; color: white;">
                                 <div style="display: flex; justify-content: center; align-items: center;">
                                     <div style="display: flex; align-items: center; width: 150px; text-align: left;">
