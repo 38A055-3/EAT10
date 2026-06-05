@@ -1345,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.deckListGrid.innerHTML = '';
         
         // Change layout for English, but keep 1fr on mobile
-        if (window.innerWidth <= 700) {
+        if (window.matchMedia("(max-width: 800px)").matches) {
             ui.deckListGrid.style.gridTemplateColumns = '1fr';
             ui.deckListGrid.style.maxWidth = '100%';
         } else if (window.currentLang === 'en') {

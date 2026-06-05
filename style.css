@@ -1064,11 +1064,7 @@ h1, h2, h3, .score, .round-indicator, .score-value, .history-label {
         overflow-y: auto;
     }
     
-    /* Force vertical column for English translation to avoid layout breaks */
-    html:lang(en) #deck-list-grid, html.translated-ltr #deck-list-grid,
-    html:lang(en) .deck-grid, html.translated-ltr .deck-grid {
-        grid-template-columns: 1fr !important;
-    }
+
     
     /* Battle Settings Mode Buttons */
     .mode-select-container {
@@ -2311,5 +2307,9 @@ body.four-player-layout #cpu2-area .history-cards {
 @media (max-width: 768px) {
     #color-selection-container {
         max-width: 240px !important;
+    }
+    
+    #deck-list-grid, .deck-grid {
+        grid-template-columns: 1fr !important;
     }
 }
