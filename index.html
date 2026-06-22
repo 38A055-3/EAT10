@@ -60,15 +60,15 @@
             </div>
             <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; margin-bottom: 2vh; position: relative; z-index: 1; transform: translateY(-50px);">
                 <button id="title-battle-btn" data-i18n="battle_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px;">バトル</button>
-                <button id="title-deck-btn" data-i18n="deck_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);">デッキ</button>
-                <button id="title-record-btn" data-i18n="record_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);">記録</button>
+                <button id="title-deck-btn" data-i18n="deck_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);">デッキ</button>
+
                 <button id="title-rules-btn" data-i18n="rules_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.4rem; padding: 1.2rem 1rem; letter-spacing: 1px; white-space: nowrap; background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);">EAT10とは？</button>
             </div>
             <p data-i18n="error_reload_msg" style="color: white; font-size: 1rem; margin-top: 10px; position: relative; z-index: 1; transform: translateY(-50px); text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">※エラーが起きる場合はリロードしてください</p>
         </div>
 
         <!-- Deck List Screen -->
-        <div id="deck-list-screen" class="screen" style="display: block; text-align: center; padding-top: 80px; overflow-y: auto; padding-bottom: 40px;">
+        <div id="deck-list-screen" class="screen" style="text-align: center; padding-top: 80px; overflow-y: auto; padding-bottom: 40px;">
             <button id="deck-list-top-back-btn" data-i18n="return_btn" class="title-return-btn hidden">戻る</button>
             <h2 data-i18n="deck_list_title" class="category-title" style="margin-bottom: 30px; font-size: 2.2rem;">デッキ一覧</h2>
             <div class="deck-list-grid" id="deck-list-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; max-width: 800px; padding: 0 20px 40px 20px; margin: 0 auto;">
@@ -122,29 +122,20 @@
                         <span data-i18n="max_streak" style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">最大連勝数</span>
                         <span id="stat-max-streak" style="font-size: 1.5rem; color: #a855f7; font-weight: 800; font-family: 'Outfit', sans-serif;">0</span>
                     </div>
-                    <div class="stat-card" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                        <span style="font-size: 0.9rem; color: #94a3b8; font-weight: bold;">現在のレート</span>
-                        <span id="stat-rating" style="font-size: 1.5rem; color: #3b82f6; font-weight: 800; font-family: 'Outfit', sans-serif;">1500</span>
-                    </div>
+
                 </div>
             </div>
         </div>
 
         <!-- Record (Ranking) Screen -->
-        <div id="record-screen" class="screen" style="position: fixed; display: block; text-align: center; padding-top: 40px; padding-bottom: 15px; overflow-y: auto; overflow-x: hidden; z-index: 50;">
+        <div id="record-screen" class="screen" style="position: fixed; text-align: center; padding-top: 40px; padding-bottom: 15px; overflow-y: auto; overflow-x: hidden; z-index: 50;">
             <button id="record-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
 
-            <h2 class="category-title" style="margin-bottom: 10px; font-size: 2rem;">オンラインランキング</h2>
+            <h2 class="category-title" style="margin-bottom: 10px; font-size: 2rem;">連勝ランキング</h2>
             <div style="display: flex; flex-direction: column; align-items: center; width: 95%; max-width: 1000px; padding: 0; margin: 0 auto 20px auto;">
 
                 <!-- Right: Global Leaderboard Section -->
                 <div id="global-ranking-section" style="flex: 1; width: 100%; display: flex; flex-direction: column;">
-                    
-                    <!-- Ranking Toggle Buttons -->
-                    <div style="display: flex; justify-content: center; margin-bottom: 10px; gap: 10px;">
-                        <button id="ranking-streak-btn" class="active" style="padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid #fbbf24; background: rgba(251, 191, 36, 0.2); color: #fbbf24; cursor: pointer;">🌍 CPU連勝</button>
-                        <button id="ranking-rate-btn" style="padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1rem; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; cursor: pointer;">⚔️ オンラインレート</button>
-                    </div>
                     
                     <div id="global-leaderboard-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 10px; flex-grow: 1;">
                         <div id="leaderboard-loading" data-i18n="loading" style="text-align: center; color: #94a3b8; padding: 20px 0;">読み込み中...</div>
@@ -239,24 +230,11 @@
                     <button id="online-format-btn" class="mode-btn" data-format="online" style="padding: 20px 40px; font-size: 1.8rem; width: 320px;">
                         <span data-i18n="online_play">友達と遊ぶ</span><br><span data-i18n="online_play_desc" class="mode-desc">ルームIDを使って通信対戦</span>
                     </button>
-                    <button id="random-format-btn" class="mode-btn" data-format="random" style="padding: 20px 40px; font-size: 1.8rem; width: 320px;">
-                        <span data-i18n="random_play">だれかと遊ぶ</span><br><span data-i18n="random_play_desc" class="mode-desc">知らない人と自動マッチング</span>
-                    </button>
+
                 </div>
             </div>
         </div>
 
-        <!-- Random Match Screen -->
-        <div id="random-match-screen" class="screen new-start-screen">
-            <button id="random-match-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
-            <h2 data-i18n="random_play" class="category-title" style="margin-top: 100px; margin-bottom: 30px; font-size: 2.2rem;">だれかと遊ぶ</h2>
-            <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 600px;">
-                <h3 data-i18n="random_match_subtitle" style="color: white; font-size: 1.5rem; margin-bottom: 20px;">ランダムマッチング</h3>
-                <p id="random-match-status" data-i18n="random_match_status" style="color: white; font-size: 1.2rem; margin-bottom: 20px;">対戦相手を探しています...</p>
-                <p data-i18n="random_match_desc" class="mode-desc" style="color: #94a3b8; font-size: 1rem; margin-bottom: 30px;">（ノーマルルール・シンプルモード）</p>
-                <div class="blinking-text" style="font-size: 3rem; color: #3b82f6;">...</div>
-            </div>
-        </div>
 
         <!-- Start Screen (Rule & Mode Selection Integrated) -->
         <div id="start-screen" class="screen new-start-screen">

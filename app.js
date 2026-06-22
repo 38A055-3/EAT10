@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         myRoom: document.getElementById('my-room-screen'),
         format: document.getElementById('format-screen'),
         guestWait: document.getElementById('guest-wait-screen'),
-        randomMatch: document.getElementById('random-match-screen'),
+
         start: document.getElementById('start-screen'),
         lobby: document.getElementById('lobby-screen'),
         game: document.getElementById('game-screen'),
@@ -284,6 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveStats() {
         localStorage.setItem('eat10_stats', JSON.stringify(stats));
+        if (typeof submitGlobalScore === 'function' && stats.maxWinStreak > 0) {
+            submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+        }
     }
     
     let playerName = localStorage.getItem('eat10_player_name') || window.t('player_name_fallback');
@@ -316,8 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sync name change to leaderboard with debounce
             if (window.nameUpdateTimeout) clearTimeout(window.nameUpdateTimeout);
             window.nameUpdateTimeout = setTimeout(() => {
-                if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
-                if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+                
+                
             }, 1000);
         });
     }
@@ -383,8 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Array.from(iconSelectionContainer.children).forEach((child, index) => {
                     child.style.border = availableIcons[index] === playerIcon ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
                 });
-                if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
-                if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+                
+                
             });
             iconSelectionContainer.appendChild(btn);
         });
@@ -415,8 +418,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Array.from(colorSelectionContainer.children).forEach((child, index) => {
                     child.style.border = availableColors[index] === playerColor ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
                 });
-                if (stats.maxWinStreak > 0) submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
-                if (stats.rating && stats.rating !== 1500) submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+                
+                
             });
             colorSelectionContainer.appendChild(btn);
         });
@@ -456,59 +459,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleRecordBtn = document.getElementById('title-record-btn');
     if (titleRecordBtn) {
         titleRecordBtn.addEventListener('click', () => {
-            document.getElementById('stat-total-battles').textContent = stats.totalBattles;
-            document.getElementById('stat-wins').textContent = stats.wins;
-            document.getElementById('stat-losses').textContent = stats.losses;
-            document.getElementById('stat-draws').textContent = stats.draws;
-            document.getElementById('stat-max-streak').textContent = stats.maxWinStreak;
-            
-            const statRatingEl = document.getElementById('stat-rating');
-            if (statRatingEl) statRatingEl.textContent = Math.floor(stats.rating || 1500);
-            
-            // Reset to streak leaderboard on open
-            currentLeaderboardMode = 'streak';
-            updateLeaderboardToggleUI();
-            
+            if (typeof fetchGlobalRanking === 'function') {
+                fetchGlobalRanking();
+            }
             switchScreen('record');
-        });
-    }
-
-    let currentLeaderboardMode = 'streak'; // 'streak' or 'rate'
-    const rankingStreakBtn = document.getElementById('ranking-streak-btn');
-    const rankingRateBtn = document.getElementById('ranking-rate-btn');
-
-    function updateLeaderboardToggleUI() {
-        if (rankingStreakBtn && rankingRateBtn) {
-            if (currentLeaderboardMode === 'streak') {
-                rankingStreakBtn.style.background = 'rgba(251, 191, 36, 0.2)';
-                rankingStreakBtn.style.color = '#fbbf24';
-                rankingRateBtn.style.background = 'transparent';
-                rankingRateBtn.style.color = 'white';
-            } else {
-                rankingRateBtn.style.background = 'rgba(59, 130, 246, 0.2)';
-                rankingRateBtn.style.color = '#3b82f6';
-                rankingStreakBtn.style.background = 'transparent';
-                rankingStreakBtn.style.color = 'white';
-            }
-        }
-        fetchGlobalRanking();
-    }
-
-    if (rankingStreakBtn) {
-        rankingStreakBtn.addEventListener('click', () => {
-            if (currentLeaderboardMode !== 'streak') {
-                currentLeaderboardMode = 'streak';
-                updateLeaderboardToggleUI();
-            }
-        });
-    }
-    
-    if (rankingRateBtn) {
-        rankingRateBtn.addEventListener('click', () => {
-            if (currentLeaderboardMode !== 'rate') {
-                currentLeaderboardMode = 'rate';
-                updateLeaderboardToggleUI();
-            }
         });
     }
 
@@ -519,20 +473,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    let previousScreenForHelp = 'title';
-
     const titleRulesBtn = document.getElementById('title-rules-btn');
     if (titleRulesBtn) {
         titleRulesBtn.addEventListener('click', () => {
-            previousScreenForHelp = 'title';
-            switchScreen('howToPlay');
-        });
-    }
-
-    const gameHelpBtn = document.getElementById('game-help-btn');
-    if (gameHelpBtn) {
-        gameHelpBtn.addEventListener('click', () => {
-            previousScreenForHelp = 'game';
             switchScreen('howToPlay');
         });
     }
@@ -540,16 +483,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const howToBackBtn = document.getElementById('how-to-back-btn');
     if (howToBackBtn) {
         howToBackBtn.addEventListener('click', () => {
-            switchScreen(previousScreenForHelp);
+            switchScreen('title');
         });
     }
 
     const howToCardListBtn = document.getElementById('how-to-card-list-btn');
     if (howToCardListBtn) {
         howToCardListBtn.addEventListener('click', () => {
+            renderCardListScreen();
             switchScreen('cardList');
-            renderAllCards();
         });
+    }
+
+    function renderCardListScreen() {
+        const grid = document.getElementById('all-cards-grid');
+        if (!grid || grid.children.length > 0) return; // already populated
+        
+        grid.classList.add('deck-grid');
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+        grid.style.gap = '30px 15px';
+        grid.style.flexDirection = '';
+        grid.style.maxWidth = '1100px';
+        grid.style.width = '100%';
+        grid.style.margin = '0 auto';
+        grid.style.justifyItems = 'center';
+        
+        for (let i = 1; i <= 10; i++) {
+            const data = CARD_DATA[i];
+            const cardEl = document.createElement('div');
+            cardEl.style.display = 'flex';
+            cardEl.style.flexDirection = 'column';
+            cardEl.style.alignItems = 'center';
+            cardEl.style.cursor = 'pointer';
+            cardEl.style.transition = 'transform 0.2s';
+            cardEl.style.width = '100%';
+            
+            cardEl.addEventListener('mouseover', () => {
+                cardEl.style.transform = 'scale(1.08)';
+            });
+            cardEl.addEventListener('mouseout', () => {
+                cardEl.style.transform = 'scale(1)';
+            });
+            
+            cardEl.innerHTML = `
+                <div class="hover-preview-card" style="width: 100%; max-width: 170px; aspect-ratio: 2.5 / 3.5; height: auto; margin: 0; flex-shrink: 0; pointer-events: none;" data-value="${i}"></div>
+                <div style="margin-top: 10px; font-weight: bold; color: white; font-size: 1.3rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-align: center;">${data.name}</div>
+            `;
+            
+            cardEl.addEventListener('click', () => {
+                if (typeof openCardDetailModal === 'function') {
+                    openCardDetailModal(i);
+                }
+            });
+            
+            grid.appendChild(cardEl);
+        }
     }
 
     const cardListBackBtn = document.getElementById('card-list-back-btn');
@@ -559,39 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderAllCards() {
-        const grid = document.getElementById('all-cards-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        
-        for (let i = 1; i <= 10; i++) {
-            const cardWrap = document.createElement('div');
-            cardWrap.className = 'deck-card-wrapper';
-            cardWrap.style.alignItems = 'center';
-            cardWrap.style.gap = '15px';
-            
-            const preview = document.createElement('div');
-            preview.className = 'hover-preview-card deck-preview';
-            preview.dataset.value = i;
-            preview.style.cursor = 'default';
-            // Disable scale animation on hover for pure listing
-            preview.style.transition = 'none';
-            
-            const info = document.createElement('div');
-            info.style.color = 'white';
-            info.style.textAlign = 'center';
-            info.innerHTML = `<div class="card-name-btn" style="font-weight:bold; color: #a855f7; font-size: 1.2rem; margin-top: 5px; cursor: pointer; padding: 5px; background: rgba(0,0,0,0.3); border-radius: 4px; display: inline-block;">${CARD_DATA[i].name} <span style="font-size: 0.8rem; color: #94a3b8;">(詳細)</span></div>`;
-            
-            info.querySelector('.card-name-btn').addEventListener('click', () => {
-                openCardDetailModal(i);
-            });
-            
-            cardWrap.appendChild(preview);
-            cardWrap.appendChild(info);
-            
-            grid.appendChild(cardWrap);
-        }
-    }
+
 
     const cardDetailModal = document.getElementById('card-detail-modal');
     const closeCardDetailBtn = document.getElementById('close-card-detail-btn');
@@ -662,15 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const randomMatchBackBtn = document.getElementById('random-match-back-btn');
-    if (randomMatchBackBtn) {
-        randomMatchBackBtn.addEventListener('click', () => {
-            if (peer) { peer.destroy(); peer = null; }
-            if (scanPeer) { scanPeer.destroy(); scanPeer = null; }
-            switchScreen('format');
-        });
-    }
-    
+        
     function showDeckPreviewModal(deckArray, titleText = window.t('check_btn')) {
         const overlay = document.createElement('div');
         overlay.style.position = 'fixed';
@@ -803,7 +752,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatBtns = {
         single: document.getElementById('single-format-btn'),
         online: document.getElementById('online-format-btn'),
-        random: document.getElementById('random-format-btn')
+        
     };
 
     if (formatBtns.single && formatBtns.online) {
@@ -827,28 +776,15 @@ document.addEventListener('DOMContentLoaded', () => {
             resetLobbyScreenUI();
             selectedFormat = 'online';
             isOnlineMode = true;
-            if (playerCountBtns[3]) playerCountBtns[3].style.display = 'block';
-            if (playerCountBtns[4]) playerCountBtns[4].style.display = 'block';
+            if (playerCountBtns[3]) playerCountBtns[3].style.display = 'none';
+            if (playerCountBtns[4]) playerCountBtns[4].style.display = 'none';
+            selectedPlayerCount = 2;
+            [2, 3, 4].forEach(c => playerCountBtns[c].classList.remove('active'));
+            if (playerCountBtns[2]) playerCountBtns[2].classList.add('active');
             switchScreen('lobby');
         });
 
-        if (formatBtns.random) {
-            formatBtns.random.addEventListener('click', () => {
-                resetStartScreenUI();
-                selectedFormat = 'random';
-                isOnlineMode = true;
-                selectedRule = 'normal';
-                
-                if (playerCountBtns[3]) playerCountBtns[3].style.display = 'none';
-                if (playerCountBtns[4]) playerCountBtns[4].style.display = 'none';
-                selectedPlayerCount = 2;
-                [2, 3, 4].forEach(c => playerCountBtns[c].classList.remove('active'));
-                if (playerCountBtns[2]) playerCountBtns[2].classList.add('active');
-                
-                switchScreen('start');
-            });
-        }
-    }
+            }
 
     // Battle Start!
     document.getElementById('play-start-btn').addEventListener('click', () => {
@@ -860,17 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentMode = selectedRule;
         
-        if (selectedFormat === 'random') {
-            if (selectedRule === 'deck') {
-                isBattleDeckSelection = true;
-                switchScreen('deckList');
-                renderDeckList();
-            } else {
-                switchScreen('randomMatch');
-                startRandomMatch('normal');
-            }
-            return;
-        }
+        
 
         if (isOnlineMode) {
             if (selectedRule === 'deck') {
@@ -1010,122 +936,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Random Matchmaking Logic ---
-    let scanPeer = null;
-    let currentRoomIndex = 1;
-    let isMatched = false;
-    let randomMatchRule = 'normal';
-
-    function startRandomMatch(rule) {
-        randomMatchRule = rule;
-        isMatched = false;
-        currentRoomIndex = 1;
-        const statusEl = document.getElementById('random-match-status');
-        if (statusEl) statusEl.textContent = '対戦相手を探しています...';
-        
-        const descEl = document.querySelector('#random-match-screen .mode-desc');
-        if (descEl) {
-            descEl.textContent = rule === 'deck' ? window.t('rule_deck_simple') : window.t('rule_normal_simple');
-        }
-        
-        scanNextRoom();
-    }
-
-    function scanNextRoom() {
-        if (selectedFormat !== 'random') return;
-        if (currentRoomIndex > 100) {
-            alert(window.t('no_match_found'));
-            switchScreen('start');
-            return;
-        }
-        
-        if (scanPeer) { scanPeer.destroy(); scanPeer = null; }
-        
-        scanPeer = new Peer();
-        scanPeer.on('open', () => {
-            if (selectedFormat !== 'random') return;
-            const targetId = 'eat10_public_' + randomMatchRule + '_' + currentRoomIndex;
-            const tempConn = scanPeer.connect(targetId, { reliable: true });
-            let handled = false;
-            
-            tempConn.on('open', () => {
-                handled = true;
-                tempConn.on('data', (data) => {
-                    if (data.type === 'busy') {
-                        tempConn.close();
-                        currentRoomIndex++;
-                        scanNextRoom();
-                    } else if (data.type === 'accept') {
-                        isMatched = true;
-                        peer = scanPeer;
-                        conn = tempConn;
-                        isHost = false;
-                        setupConnection();
-                    }
-                });
-            });
-
-            scanPeer.on('error', (err) => {
-                if (!handled && err.type === 'peer-unavailable') {
-                    handled = true;
-                    scanPeer.destroy();
-                    scanPeer = null;
-                    if (selectedFormat === 'random') {
-                        becomeRoomHost(targetId);
-                    }
-                }
-            });
-            
-            setTimeout(() => {
-                if (!handled) {
-                    handled = true;
-                    currentRoomIndex++;
-                    scanNextRoom();
-                }
-            }, 3000);
-        });
-    }
-
-    function becomeRoomHost(roomId) {
-        if (peer) { peer.destroy(); }
-        peer = new Peer(roomId);
-        
-        peer.on('open', () => {
-            if (selectedFormat !== 'random') {
-                peer.destroy();
-                return;
-            }
-            const statusEl = document.getElementById('random-match-status');
-            if (statusEl) statusEl.textContent = window.t('room_created_waiting');
-        });
-        
-        peer.on('connection', (tempConn) => {
-            if (isMatched) {
-                tempConn.on('open', () => {
-                    tempConn.send({ type: 'busy' });
-                    setTimeout(() => tempConn.close(), 500);
-                });
-                return;
-            }
-            
-            isMatched = true;
-            conn = tempConn;
-            isHost = true;
-            
-            conn.on('open', () => {
-                conn.send({ type: 'accept' });
-                setupConnection();
-            });
-        });
-        
-        peer.on('error', (err) => {
-            if (err.type === 'unavailable-id') {
-                currentRoomIndex++;
-                scanNextRoom();
-            }
-        });
-    }
-
     function setupConnection() {
         conn.on('data', handleNetworkData);
         conn.on('close', () => {
@@ -1141,9 +951,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rating: stats.rating || 1500,
             seed: gameSeed
         };
-        if (selectedFormat === 'random' && currentMode === 'deck') {
-            handshakeData.deck = currentCustomDeck;
-        }
+        
 
         conn.send(handshakeData);
     }
@@ -1159,43 +967,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (isHost) {
-                if (selectedFormat === 'random') {
-                    setTimeout(() => {
-                        conn.send({ type: 'start', rule: currentMode, mode: 'simple', deck: currentCustomDeck });
-                        startGame(currentMode, currentMode === 'deck' ? currentCustomDeck : null);
-                    }, 500);
-                } else {
-                    const hostInfo = document.getElementById('host-lobby-info');
-                    const hostOppName = document.getElementById('host-lobby-opponent-name');
-                    if (hostInfo && hostOppName) {
-                        hostInfo.classList.remove('hidden');
-                        hostOppName.textContent = window.t('opponent_joined').replace('{0}', opponentName);
-                    }
-                    switchScreen('start');
+                const hostInfo = document.getElementById('host-lobby-info');
+                const hostOppName = document.getElementById('host-lobby-opponent-name');
+                if (hostInfo && hostOppName) {
+                    hostInfo.classList.remove('hidden');
+                    hostOppName.textContent = window.t('opponent_joined').replace('{0}', opponentName);
                 }
+                switchScreen('start');
             } else {
-                if (selectedFormat !== 'random') {
-                    const hostInfo = document.getElementById('host-lobby-info');
-                    const hostOppName = document.getElementById('host-lobby-opponent-name');
-                    if (hostInfo && hostOppName) {
-                        hostInfo.classList.remove('hidden');
-                        hostOppName.textContent = window.t('host_label').replace('{0}', opponentName);
-                    }
-                    
-                    const startBtn = document.getElementById('play-start-btn');
-                    if (startBtn) {
-                        startBtn.textContent = window.t('host_wait');
-                        startBtn.disabled = true;
-                        startBtn.style.opacity = '0.7';
-                        startBtn.style.cursor = 'not-allowed';
-                    }
-                    
-                    document.querySelectorAll('.select-toggle').forEach(btn => {
-                        btn.style.pointerEvents = 'none';
-                    });
-                    
-                    switchScreen('start');
+                const hostInfo = document.getElementById('host-lobby-info');
+                const hostOppName = document.getElementById('host-lobby-opponent-name');
+                if (hostInfo && hostOppName) {
+                    hostInfo.classList.remove('hidden');
+                    hostOppName.textContent = window.t('host_label').replace('{0}', opponentName);
                 }
+                
+                const startBtn = document.getElementById('play-start-btn');
+                if (startBtn) {
+                    startBtn.textContent = window.t('host_wait');
+                    startBtn.disabled = true;
+                    startBtn.style.opacity = '0.7';
+                    startBtn.style.cursor = 'not-allowed';
+                }
+                
+                document.querySelectorAll('.select-toggle').forEach(btn => {
+                    btn.style.pointerEvents = 'none';
+                });
+                
+                switchScreen('start');
             }
         } else if (data.type === 'start') {
             currentMode = data.rule;
@@ -1259,22 +1058,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('restart-btn').addEventListener('click', () => {
         if (isOnlineMode) {
-            if (selectedFormat === 'random') {
-                if (peer) {
-                    peer.destroy();
-                    peer = null;
-                }
+            if (isHost) {
                 switchScreen('start');
             } else {
-                if (isHost) {
-                    switchScreen('start');
-                } else {
-                    const guestWaitMsg = document.getElementById('guest-wait-message');
-                    const guestLobbyHostName = document.getElementById('guest-lobby-host-name');
-                    if (guestLobbyHostName) guestLobbyHostName.textContent = opponentName;
-                    if (guestWaitMsg) guestWaitMsg.textContent = window.t('setting_rules');
-                    switchScreen('guestWait');
-                }
+                const guestWaitMsg = document.getElementById('guest-wait-message');
+                const guestLobbyHostName = document.getElementById('guest-lobby-host-name');
+                if (guestLobbyHostName) guestLobbyHostName.textContent = opponentName;
+                if (guestWaitMsg) guestWaitMsg.textContent = window.t('setting_rules');
+                switchScreen('guestWait');
             }
         } else {
             startGame(currentMode, currentMode === 'deck' ? currentCustomDeck : null);
@@ -1319,12 +1110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        if (selectedFormat === 'random') {
-            currentMode = 'deck';
-            switchScreen('randomMatch');
-            startRandomMatch('deck');
-            return;
-        }
+
         
         if (isOnlineMode) {
             conn.send({ type: 'deck_ready', deck: currentCustomDeck });
@@ -1809,17 +1595,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function submitGlobalScore(name, streak, icon, color) {
         if (!name || streak <= 0) return;
-        const playerRef = db.ref('leaderboard/' + playerUid);
-        
+        const playerRef = db.ref('leaderboard/' + name);
         playerRef.once('value').then((snapshot) => {
             const existingData = snapshot.val();
-            if (!existingData || streak > existingData.streak) {
+            if (!existingData || existingData.streak < streak) {
                 playerRef.set({
                     name: name,
-                    icon: icon || 'ha.png',
-                    color: color || 'rgba(255, 255, 255, 0.8)',
                     streak: streak,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                    icon: icon || 'ha.png',
+                    color: color || 'rgba(255, 255, 255, 0.8)'
                 });
             } else if (existingData && (existingData.name !== name || existingData.icon !== icon || existingData.color !== color)) {
                 playerRef.update({
@@ -1829,19 +1613,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }).catch(err => console.error("Firebase update failed:", err));
-    }
-
-    function submitGlobalRatingScore(name, rating, icon, color) {
-        if (!name || rating <= 0) return;
-        const playerRef = db.ref('rate_leaderboard/' + playerUid);
-        
-        playerRef.set({
-            name: name,
-            icon: icon || 'ha.png',
-            color: color || 'rgba(255, 255, 255, 0.8)',
-            rating: Math.floor(rating),
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        }).catch(err => console.error("Firebase rating update failed:", err));
     }
 
     function fetchGlobalRanking() {
@@ -1855,20 +1626,12 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingEl.style.display = 'block';
         tableEl.style.display = 'none';
         
-        // Push local max streak if exists
-        if (stats.maxWinStreak > 0) {
-            submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
-        }
-        if (stats.rating && stats.rating !== 1500) {
-            submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
-        }
-        
         if (valueCol) {
-            valueCol.textContent = currentLeaderboardMode === 'streak' ? window.t('streak_col') : 'レート';
+            valueCol.textContent = window.t('streak_col');
         }
         
-        const dbPath = currentLeaderboardMode === 'streak' ? 'leaderboard' : 'rate_leaderboard';
-        const orderBy = currentLeaderboardMode === 'streak' ? 'streak' : 'rating';
+        const dbPath = 'leaderboard';
+        const orderBy = 'streak';
         
         db.ref(dbPath).orderByChild(orderBy).limitToLast(10).once('value')
             .then((snapshot) => {
@@ -1933,7 +1696,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchScreen(screenName) {
-        Object.values(screens).forEach(s => s.classList.remove('active'));
+        Object.values(screens).forEach(s => { if (s) s.classList.remove('active'); });
         const targetScreen = screens[screenName];
         targetScreen.classList.add('active');
         targetScreen.scrollTop = 0;
@@ -1969,7 +1732,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } else if (screenName === 'title') {
-            fetchGlobalRanking();
+            
         } else if (screenName === 'lobby') {
             const actionSelection = document.getElementById('lobby-action-selection');
             const lobbyContainer = document.getElementById('lobby-container');
@@ -3314,7 +3077,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             stats.rating = Math.max(0, Math.floor(stats.rating + K * (actualScore - expectedScore)));
-            submitGlobalRatingScore(playerName, stats.rating, playerIcon, playerColor);
+            
             saveStats();
         }
         
@@ -3331,7 +3094,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 winStreakCount++;
                 if (winStreakCount > stats.maxWinStreak) {
                     stats.maxWinStreak = winStreakCount;
-                    submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+                    
                 }
                 ui.finalTitle.textContent = 'WIN';
                 ui.finalTitle.style.color = 'var(--win-color)';
@@ -3582,7 +3345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         closeSettingsBtn.addEventListener('click', closeSettings);
 
-        fetchGlobalRanking();
+        
     }
 
 });
