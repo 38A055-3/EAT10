@@ -54,17 +54,18 @@
                 </a>
             </div>
             <img src="title.png" class="title-image animate-logo" alt="EAT10 Logo" style="margin-bottom: 5px; position: relative; z-index: 1;">
-            <div style="margin: auto 0; position: relative; z-index: 1; text-align: center; transform: translateY(-70px);">
-                <button id="player-icon-btn" style="background: rgba(255, 255, 255, 0.8); border: 2px solid rgba(168, 85, 247, 0.5); border-radius: 50%; width: 130px; height: 130px; font-size: 1.5rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 5px; transition: transform 0.2s; overflow: hidden; position: relative;" onmouseover="this.style.transform='scale(1.1)'; const tt=document.getElementById('player-name-tooltip'); if(tt){tt.style.opacity='1'; tt.style.transform='translateX(-50%) translateY(0)';}" onmouseout="this.style.transform='scale(1)'; const tt=document.getElementById('player-name-tooltip'); if(tt){tt.style.opacity='0'; tt.style.transform='translateX(-50%) translateY(10px)';}"></button>
-                <div id="player-name-tooltip" style="position: absolute; top: -40px; left: 50%; transform: translateX(-50%) translateY(10px); color: white; font-size: 1.3rem; font-weight: bold; pointer-events: none; opacity: 0; transition: all 0.2s ease-out; white-space: nowrap; z-index: 10; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">プレイヤー名</div>
+
+            <div style="text-align: center; margin-bottom: 20px; position: relative; z-index: 1; transform: translateY(-30px);">
+                <input type="text" id="player-name-input" data-i18n="player_name_placeholder" placeholder="プレイヤー名" value="プレイヤー名" maxlength="10" style="padding: 10px 20px; font-size: 1.4rem; border-radius: 8px; border: 2px solid rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); color: white; text-align: center; width: 250px; outline: none; font-weight: bold; font-family: 'Inter', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
             </div>
-            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; margin-bottom: 2vh; position: relative; z-index: 1; transform: translateY(-50px);">
+
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; margin-bottom: 2vh; margin-top: 10px; position: relative; z-index: 1;">
                 <button id="title-battle-btn" data-i18n="battle_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px;">バトル</button>
                 <button id="title-deck-btn" data-i18n="deck_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.6rem; padding: 1.2rem 1rem; letter-spacing: 2px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);">デッキ</button>
 
                 <button id="title-rules-btn" data-i18n="rules_btn" class="primary-btn battle-start-btn" style="flex: 1; min-width: 180px; max-width: 280px; font-size: 1.4rem; padding: 1.2rem 1rem; letter-spacing: 1px; white-space: nowrap; background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);">EAT10とは？</button>
             </div>
-            <p data-i18n="error_reload_msg" style="color: white; font-size: 1rem; margin-top: 10px; position: relative; z-index: 1; transform: translateY(-50px); text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">※エラーが起きる場合はリロードしてください</p>
+            <p data-i18n="error_reload_msg" style="color: white; font-size: 1rem; margin-top: 30px; position: relative; z-index: 1; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">※エラーが起きる場合はリロードしてください</p>
         </div>
 
         <!-- Deck List Screen -->
@@ -86,12 +87,8 @@
             <button id="my-room-back-btn" data-i18n="return_btn" class="title-return-btn">戻る</button>
             
             <div style="text-align: center; margin-bottom: 35px; margin-top: 20px;">
-                <input type="text" id="player-name-input" data-i18n="player_name_placeholder" placeholder="プレイヤー名" value="プレイヤー名" maxlength="10" style="padding: 10px 20px; font-size: 1.4rem; border-radius: 8px; border: 2px solid rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); color: white; text-align: center; width: 250px; outline: none; font-weight: bold; font-family: 'Inter', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 35px;">
                 
-                <h3 style="color: white; font-size: 1.2rem; margin-bottom: 10px;">キャラクター</h3>
-                <div id="icon-selection-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 340px; margin: 0 auto;">
-                    <!-- Icons will be injected here by app.js -->
-                </div>
+
                 
                 <h3 style="color: white; font-size: 1.2rem; margin-top: 15px; margin-bottom: 10px;">背景色</h3>
                 <div id="color-selection-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 600px; margin: 0 auto;">
@@ -381,7 +378,7 @@
                 <!-- CPU1 Area -->
                 <div id="cpu1-area" class="player-area cpu-area">
                     <div class="score-container">
-                        <span id="cpu1-name-display" class="player-label"><span id="cpu1-icon-display">🤖</span> CPU 1</span>
+                        <span id="cpu1-name-display" class="player-label">CPU 1</span>
                         <span id="cpu1-score" class="score">0</span>
                     </div>
                     <div class="cards-layout">
@@ -409,7 +406,7 @@
                 <!-- CPU2 Area -->
                 <div id="cpu2-area" class="player-area cpu-area hidden">
                     <div class="score-container">
-                        <span id="cpu2-name-display" class="player-label"><span id="cpu2-icon-display">🤖</span> CPU 2</span>
+                        <span id="cpu2-name-display" class="player-label">CPU 2</span>
                         <span id="cpu2-score" class="score">0</span>
                     </div>
                     <div class="cards-layout">
@@ -437,7 +434,7 @@
                 <!-- CPU3 Area -->
                 <div id="cpu3-area" class="player-area cpu-area hidden">
                     <div class="score-container">
-                        <span id="cpu3-name-display" class="player-label"><span id="cpu3-icon-display">🤖</span> CPU 3</span>
+                        <span id="cpu3-name-display" class="player-label">CPU 3</span>
                         <span id="cpu3-score" class="score">0</span>
                     </div>
                     <div class="cards-layout">

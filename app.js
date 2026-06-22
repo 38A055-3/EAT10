@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let conn = null;
     let isHost = false;
     let opponentName = 'CPU';
-    let opponentIcon = '🤖';
     let opponentRating = 1500;
     let gameSeed = Math.floor(Math.random() * 1000000);
     
@@ -285,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveStats() {
         localStorage.setItem('eat10_stats', JSON.stringify(stats));
         if (typeof submitGlobalScore === 'function' && stats.maxWinStreak > 0) {
-            submitGlobalScore(playerName, stats.maxWinStreak, playerIcon, playerColor);
+            submitGlobalScore(playerName, stats.maxWinStreak, playerColor);
         }
     }
     
@@ -305,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const playerNameInput = document.getElementById('player-name-input');
-    const playerIconBtn = document.getElementById('player-icon-btn');
     const playerNameTooltip = document.getElementById('player-name-tooltip');
     
     if (playerNameInput) {
@@ -313,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
         playerNameInput.addEventListener('input', (e) => {
             playerName = e.target.value.trim() || window.t('player_name_fallback');
             localStorage.setItem('eat10_player_name', playerName);
-            if (playerIconBtn) playerIconBtn.title = playerName;
             if (playerNameTooltip) playerNameTooltip.innerText = playerName;
             
             // Sync name change to leaderboard with debounce
@@ -325,7 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const availableIcons = ['ha.png', 'tyo.png', 'ku.png', 'ka.png', 'ne.png', 'he.png', 'ne2.png', 'i.png', 'ku2.png', 'hi.png'];
     const availableColors = [
         'rgba(239, 68, 68, 0.8)',    // 赤 (Red)
         'rgba(59, 130, 246, 0.8)',   // 青 (Blue)
@@ -338,60 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'rgba(0, 0, 0, 0.8)',        // 黒 (Black)
         'rgba(255, 255, 255, 0.8)'   // 白 (White)
     ];
-    let playerIcon = localStorage.getItem('eat10_player_icon') || 'ha.png';
     let playerColor = localStorage.getItem('eat10_player_color') || 'rgba(255, 255, 255, 0.8)';
-    const iconSelectionContainer = document.getElementById('icon-selection-container');
     const colorSelectionContainer = document.getElementById('color-selection-container');
-    
-    if (playerIconBtn) {
-        playerIconBtn.title = playerName;
-        if (playerNameTooltip) playerNameTooltip.innerText = playerName;
-        playerIconBtn.style.background = playerColor;
-        playerIconBtn.innerHTML = `<img src="${playerIcon}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; transform: scale(1.15);">`;
-        playerIconBtn.addEventListener('click', () => {
-            switchScreen('myRoom');
-        });
-    }
-
-    function updateIconSelectionBackgrounds() {
-        if (!iconSelectionContainer) return;
-        Array.from(iconSelectionContainer.children).forEach(child => {
-            child.style.background = playerColor;
-        });
-    }
-
-    if (iconSelectionContainer) {
-        iconSelectionContainer.innerHTML = '';
-        availableIcons.forEach(iconPath => {
-            const btn = document.createElement('div');
-            btn.style.width = '60px';
-            btn.style.height = '60px';
-            btn.style.borderRadius = '50%';
-            btn.style.cursor = 'pointer';
-            btn.style.border = playerIcon === iconPath ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
-            btn.style.background = playerColor;
-            btn.style.display = 'flex';
-            btn.style.alignItems = 'center';
-            btn.style.justifyContent = 'center';
-            btn.style.overflow = 'hidden';
-            btn.style.transition = 'background 0.2s';
-            btn.innerHTML = `<img src="${iconPath}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);">`;
-            
-            btn.addEventListener('click', () => {
-                playerIcon = iconPath;
-                localStorage.setItem('eat10_player_icon', playerIcon);
-                if (playerIconBtn) {
-                    playerIconBtn.innerHTML = `<img src="${playerIcon}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; transform: scale(1.15);">`;
-                }
-                Array.from(iconSelectionContainer.children).forEach((child, index) => {
-                    child.style.border = availableIcons[index] === playerIcon ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
-                });
-                
-                
-            });
-            iconSelectionContainer.appendChild(btn);
-        });
-    }
 
     if (colorSelectionContainer) {
         colorSelectionContainer.innerHTML = '';
@@ -411,10 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 playerColor = colorVal;
                 localStorage.setItem('eat10_player_color', playerColor);
-                if (playerIconBtn) {
-                    playerIconBtn.style.background = playerColor;
-                }
-                updateIconSelectionBackgrounds();
                 Array.from(colorSelectionContainer.children).forEach((child, index) => {
                     child.style.border = availableColors[index] === playerColor ? '3px solid #a855f7' : '2px solid rgba(255,255,255,0.2)';
                 });
@@ -947,9 +887,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const handshakeData = {
             type: 'init',
             name: playerName,
-            icon: playerIcon,
-            rating: stats.rating || 1500,
-            seed: gameSeed
+            color: playerColor,
+            isCpu: false
         };
         
 
@@ -959,7 +898,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleNetworkData(data) {
         if (data.type === 'init') {
             opponentName = data.name || 'Opponent';
-            opponentIcon = data.icon || 'ha.png';
             opponentRating = data.rating || 1500;
             if (data.deck) opponentCustomDeck = data.deck;
             if (data.seed !== undefined && !isHost) {
@@ -1593,7 +1531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const db = firebase.database();
 
-    function submitGlobalScore(name, streak, icon, color) {
+    function submitGlobalScore(name, streak, color) {
         if (!name || streak <= 0) return;
         const playerRef = db.ref('leaderboard/' + name);
         playerRef.once('value').then((snapshot) => {
@@ -1602,13 +1540,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 playerRef.set({
                     name: name,
                     streak: streak,
-                    icon: icon || 'ha.png',
                     color: color || 'rgba(255, 255, 255, 0.8)'
                 });
-            } else if (existingData && (existingData.name !== name || existingData.icon !== icon || existingData.color !== color)) {
+            } else if (existingData && (existingData.name !== name || existingData.color !== color)) {
                 playerRef.update({
                     name: name,
-                    icon: icon || 'ha.png',
                     color: color || 'rgba(255, 255, 255, 0.8)'
                 });
             }
@@ -1672,13 +1608,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         tr.innerHTML = `
                             <td style="padding: 10px; text-align: center; font-weight: bold; white-space: nowrap; color: ${index < 3 ? '#fbbf24' : '#94a3b8'};">${rankText}</td>
                             <td style="padding: 10px; font-weight: bold; color: white;">
-                                <div style="display: flex; justify-content: center; align-items: center;">
-                                    <div style="display: flex; align-items: center; width: 150px; text-align: left;">
-                                        <span style="display:inline-flex; align-items:center; margin-right:12px; vertical-align: middle; flex-shrink: 0;">
-                                            ${entry.icon && entry.icon.endsWith('.png') ? `<div style="background: ${entry.color || 'rgba(255, 255, 255, 0.8)'}; border-radius: 50%; display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"><img src="${entry.icon}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);"></div>` : `<span style="font-size:1.1rem;">${entry.icon || 'ha.png'}</span>`}
-                                        </span> 
-                                        <span style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${entry.name}</span>
-                                    </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <span style="font-size: 1.3rem; font-weight: bold; color: ${entry.color || 'white'};">${entry.name}</span>
                                 </div>
                             </td>
                             <td style="padding: 10px; text-align: right; font-size: 1.15rem; font-weight: bold; font-family: 'Outfit', sans-serif; color: ${currentLeaderboardMode === 'streak' ? '#4ade80' : '#3b82f6'};">${entry[orderBy]}</td>
